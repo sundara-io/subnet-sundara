@@ -1,7 +1,7 @@
 # The MIT License (MIT)
-# Copyright © 2021 Yuma Rao
-# Copyright © 2023 Opentensor Foundation
-# Copyright © 2023 Opentensor Technologies Inc
+# Copyright © 2023 Yuma Rao
+# TODO(developer): Set your name
+# Copyright © 2023 Sundara Team
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 # documentation files (the “Software”), to deal in the Software without restriction, including without limitation
@@ -17,28 +17,37 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-import bittensor as bt
-from typing import List, Optional, Union, Any, Dict
-from template.protocol import Dummy
-from bittensor.subnets import SubnetsAPI
+import torch
+from typing import List
+import re
 
+def reward(query: int, response: int) -> float:
+    """
+    Reward the miner response to the dummy request. This method returns a reward
+    value for the miner, which is used to update the miner's score.
 
-class DummyAPI(SubnetsAPI):
-    def __init__(self, wallet: "bt.wallet"):
-        super().__init__(wallet)
-        self.netuid = 33
-        self.name = "dummy"
+    Returns:
+    - float: The reward value for the miner.
+    """
 
-    def prepare_synapse(self, dummy_input: int) -> Dummy:
-        synapse.dummy_input = dummy_input
-        return synapse
+    return 1.0 if response == str(query) else 0
 
-    def process_responses(
-        self, responses: List[Union["bt.Synapse", Any]]
-    ) -> List[int]:
-        outputs = []
-        for response in responses:
-            if response.dendrite.status_code != 200:
-                continue
-            return outputs.append(response.dummy_output)
-        return outputs
+def get_rewards(
+    self,
+    query: int,
+    responses: List[float],
+) -> torch.FloatTensor:
+    """
+    Returns a tensor of rewards for the given query and responses.
+
+    Args:
+    - query (int): The query sent to the miner.
+    - responses (List[float]): A list of responses from the miner.
+
+    Returns:
+    - torch.FloatTensor: A tensor of rewards for the given query and responses.
+    """
+    # Get all the reward results by iteratively calling your reward() function.
+    return torch.FloatTensor(
+        [reward(query, response) for response in responses]
+    ).to(self.device)

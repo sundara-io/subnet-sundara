@@ -1,2 +1,5 @@
 bittensor
 torch
+aiohttp
+fastapi
+uvicorn

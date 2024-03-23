@@ -1,7 +1,7 @@
 # The MIT License (MIT)
 # Copyright © 2023 Yuma Rao
 # TODO(developer): Set your name
-# Copyright © 2023 <your name>
+# Copyright © 2023 Sundara Team
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 # documentation files (the “Software”), to deal in the Software without restriction, including without limitation
@@ -22,11 +22,11 @@ import typing
 import bittensor as bt
 
 # Bittensor Miner Template:
-import template
+import sundara
 
 # import base miner class which takes care of most of the boilerplate
-from template.base.miner import BaseMinerNeuron
-
+from sundara.base.miner import BaseMinerNeuron
+from models.docker import Ollama
 
 class Miner(BaseMinerNeuron):
     """
@@ -39,12 +39,12 @@ class Miner(BaseMinerNeuron):
 
     def __init__(self, config=None):
         super(Miner, self).__init__(config=config)
-
-        # TODO(developer): Anything specific to your use case you can do here
+        self.engine = Ollama()
+        self.engine.start()
 
     async def forward(
-        self, synapse: template.protocol.Dummy
-    ) -> template.protocol.Dummy:
+        self, synapse: sundara.protocol.Inference
+    ) -> sundara.protocol.Inference:
         """
         Processes the incoming 'Dummy' synapse by performing a predefined operation on the input data.
         This method should be replaced with actual logic relevant to the miner's purpose.
@@ -59,11 +59,14 @@ class Miner(BaseMinerNeuron):
         the miner's intended operation. This method demonstrates a basic transformation of input data.
         """
         # TODO(developer): Replace with actual implementation logic.
-        synapse.dummy_output = synapse.dummy_input * 2
+        bt.logging.info(f"receive request: {synapse}")
+
+        result = await self.engine.inference(model=synapse.model, prompt=synapse.input)
+        synapse.result = result
         return synapse
 
     async def blacklist(
-        self, synapse: template.protocol.Dummy
+        self, synapse: sundara.protocol.Inference
     ) -> typing.Tuple[bool, str]:
         """
         Determines whether an incoming request should be blacklisted and thus ignored. Your implementation should
@@ -119,7 +122,7 @@ class Miner(BaseMinerNeuron):
         )
         return False, "Hotkey recognized!"
 
-    async def priority(self, synapse: template.protocol.Dummy) -> float:
+    async def priority(self, synapse: sundara.protocol.Inference) -> float:
         """
         The priority function determines the order in which requests are handled. More valuable or higher-priority
         requests are processed before others. You should design your own priority mechanism with care.
