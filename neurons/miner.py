@@ -26,7 +26,24 @@ import sundara
 
 # import base miner class which takes care of most of the boilerplate
 from sundara.base.miner import BaseMinerNeuron
+from sundara.supervisor import Supervisor
 from models.docker import Ollama
+
+from threading import Lock
+
+class MinerState:
+    def __init__(self) -> None:
+        self.worker_state = 0
+        self._lock = Lock()
+    
+    def set_state(self, new_state):
+        self._lock.acquire()
+        self.worker_state = new_state
+        self._lock.release()
+
+    def get_state(self):
+        return self.worker_state
+    
 
 class Miner(BaseMinerNeuron):
     """
@@ -39,8 +56,11 @@ class Miner(BaseMinerNeuron):
 
     def __init__(self, config=None):
         super(Miner, self).__init__(config=config)
-        self.engine = Ollama()
-        self.engine.start()
+        # self.engine = Ollama()
+        # self.engine.start()
+        self.miner_state = MinerState()
+        self.supervisor = Supervisor(self)
+        self.supervisor.start()
 
     async def forward(
         self, synapse: sundara.protocol.Inference
@@ -60,8 +80,9 @@ class Miner(BaseMinerNeuron):
         """
         # TODO(developer): Replace with actual implementation logic.
         bt.logging.info(f"receive request: {synapse}")
-
+        self.miner_state.set_state(1)
         result = await self.engine.inference(model=synapse.model, prompt=synapse.input)
+        self.miner_state.set_state(0)
         synapse.result = result
         return synapse
 
@@ -161,3 +182,6 @@ if __name__ == "__main__":
         while True:
             bt.logging.info("Miner running...", time.time())
             time.sleep(5)
+            miner.miner_state.set_state(1)
+            time.sleep(5)
+            miner.miner_state.set_state(0)
