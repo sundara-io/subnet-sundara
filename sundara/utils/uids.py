@@ -2,7 +2,7 @@ import torch
 import random
 import bittensor as bt
 from typing import List
-
+from ..protocol import State
 
 def check_uid_availability(
     metagraph: "bt.metagraph.Metagraph", uid: int, vpermit_tao_limit: int
@@ -59,6 +59,55 @@ def get_random_uids(
         available_uids += random.sample(
             [uid for uid in avail_uids if uid not in candidate_uids],
             k - len(candidate_uids),
+        )
+    uids = torch.tensor(random.sample(available_uids, k))
+    return uids
+
+async def get_idle_uids(
+    self, k: int, exclude: List[int] = None
+) -> torch.LongTensor:
+    """Returns k available random uids from the metagraph.
+    Args:
+        k (int): Number of uids to return.
+        exclude (List[int]): List of uids to exclude from the random sampling.
+    Returns:
+        uids (torch.LongTensor): Randomly sampled available uids.
+    Notes:
+        If `k` is larger than the number of available `uids`, set `k` to the number of available `uids`.
+    """
+    candidate_uids = []
+    avail_uids = []
+
+    for uid in range(self.metagraph.n.item()):
+        uid_is_available = check_uid_availability(
+            self.metagraph, uid, self.config.neuron.vpermit_tao_limit
+        )
+        uid_is_not_excluded = exclude is None or uid not in exclude
+
+        if uid_is_available:
+            avail_uids.append(uid)
+            if uid_is_not_excluded:
+                candidate_uids.append(uid)
+    
+    state_resp = await self.dendrite(
+            axons=[self.metagraph.axons[uid] for uid in candidate_uids],
+            synapse=State(),
+            deserialize=False,
+    )
+
+    idle_uids = []
+    for i, s in enumerate(state_resp):
+        if s.state == 0:
+            idle_uids.append(candidate_uids[i])
+
+    # If k is larger than the number of available uids, set k to the number of available uids.
+    k = min(k, len(avail_uids))
+    # Check if candidate_uids contain enough for querying, if not grab all avaliable uids
+    available_uids = idle_uids
+    if len(idle_uids) < k:
+        available_uids += random.sample(
+            [uid for uid in avail_uids if uid not in idle_uids],
+            k - len(idle_uids),
         )
     uids = torch.tensor(random.sample(available_uids, k))
     return uids
