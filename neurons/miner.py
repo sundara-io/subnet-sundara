@@ -26,28 +26,28 @@ import sundara
 
 # import base miner class which takes care of most of the boilerplate
 from sundara.base.miner import BaseMinerNeuron
-from sundara.supervisor import Supervisor
 from models.docker import Ollama
 
 from threading import Lock
 
 class MinerState:
     def __init__(self) -> None:
-        self.worker_state = 0
+        self.working_state = 0
         self._lock = Lock()
     
     def set_state(self, new_state):
         self._lock.acquire()
-        self.worker_state = new_state
+        self.working_state = new_state
         self._lock.release()
 
     def get_state(self):
-        return self.worker_state
+        return self.working_state
     
 
 class Miner(BaseMinerNeuron):
     """
-    Your miner neuron class. You should use this class to define your miner's behavior. In particular, you should replace the forward function with your own logic. You may also want to override the blacklist and priority functions according to your needs.
+    Your miner neuron
+        ) class. You should use this class to define your miner's behavior. In particular, you should replace the forward function with your own logic. You may also want to override the blacklist and priority functions according to your needs.
 
     This class inherits from the BaseMinerNeuron class, which in turn inherits from BaseNeuron. The BaseNeuron class takes care of routine tasks such as setting up wallet, subtensor, metagraph, logging directory, parsing config, etc. You can override any of the methods in BaseNeuron if you need to customize the behavior.
 
@@ -59,8 +59,12 @@ class Miner(BaseMinerNeuron):
         # self.engine = Ollama()
         # self.engine.start()
         self.miner_state = MinerState()
-        self.supervisor = Supervisor(self)
-        self.supervisor.start()
+
+    async def get_state(
+        self, synapse: sundara.protocol.State
+    ) -> sundara.protocol.State:
+        synapse.state = self.miner_state.get_state()
+        return synapse
 
     async def forward(
         self, synapse: sundara.protocol.Inference
@@ -182,6 +186,8 @@ if __name__ == "__main__":
         while True:
             bt.logging.info("Miner running...", time.time())
             time.sleep(5)
+            
+            # FIXME: remove these debugg codes
             miner.miner_state.set_state(1)
             time.sleep(5)
             miner.miner_state.set_state(0)

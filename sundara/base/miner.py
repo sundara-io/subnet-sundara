@@ -23,6 +23,7 @@ import argparse
 import traceback
 
 import bittensor as bt
+from abc import ABC, abstractmethod
 
 from sundara.base.neuron import BaseNeuron
 from sundara.utils.config import add_miner_args
@@ -39,6 +40,10 @@ class BaseMinerNeuron(BaseNeuron):
     def add_args(cls, parser: argparse.ArgumentParser):
         super().add_args(parser)
         add_miner_args(cls, parser)
+
+    @abstractmethod
+    async def get_state(self, synapse: bt.Synapse) -> bt.Synapse:
+        ...
 
     def __init__(self, config=None):
         super().__init__(config=config)
@@ -62,6 +67,8 @@ class BaseMinerNeuron(BaseNeuron):
             forward_fn=self.forward,
             blacklist_fn=self.blacklist,
             priority_fn=self.priority,
+        ).attach(
+            forward_fn=self.get_state
         )
         bt.logging.info(f"Axon created: {self.axon}")
 

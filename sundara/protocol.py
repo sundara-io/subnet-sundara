@@ -45,3 +45,9 @@ class Inference(bt.Synapse):
     result: typing.Optional[str] = None
     def deserialize(self) -> int:
         return self.result
+
+class State(bt.Synapse):
+    # -1 unknown
+    # 0 idle
+    # 1 busy
+    state: int = -1
