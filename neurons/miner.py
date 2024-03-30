@@ -27,15 +27,21 @@ import sundara
 # import base miner class which takes care of most of the boilerplate
 from sundara.base.miner import BaseMinerNeuron
 from models.docker import Ollama
-from sundara.utils.monitor import (get_cpu_info, get_gpu_infos, get_mem_info)
+from sundara.utils.monitor import (
+    get_cpu_info,
+    get_gpu_infos,
+    get_mem_info,
+    get_disk_info,
+)
 from threading import Lock
 from sundara.protocol import SystemInfo
+
 
 class MinerState:
     def __init__(self) -> None:
         self.working_state = 0
         self._lock = Lock()
-    
+
     def set_state(self, new_state):
         self._lock.acquire()
         self.working_state = new_state
@@ -43,7 +49,7 @@ class MinerState:
 
     def get_state(self):
         return self.working_state
-    
+
 
 class Miner(BaseMinerNeuron):
     """
@@ -66,9 +72,10 @@ class Miner(BaseMinerNeuron):
     ) -> sundara.protocol.SystemInfoSynapse:
         synapse.system_info = SystemInfo(
             status=self.miner_state.get_state(),
-            cpu = get_cpu_info(),
-            mem = get_mem_info(),
-            gpus = get_gpu_infos(),
+            cpu=get_cpu_info(),
+            mem=get_mem_info(),
+            disk=get_disk_info(),
+            gpus=get_gpu_infos(),
         )
         return synapse
 
@@ -192,7 +199,7 @@ if __name__ == "__main__":
         while True:
             bt.logging.info("Miner running...", time.time())
             time.sleep(5)
-            
+
             # FIXME: remove these debugg codes
             miner.miner_state.set_state(1)
             time.sleep(5)

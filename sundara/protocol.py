@@ -49,16 +49,22 @@ class InferenceSynapse(bt.Synapse):
         return self.result
 
 class CPUInfo(pydantic.BaseModel):
-    cpu_count: int
-    cpu_freq: float
-    cpu_percent: int
+    count: int
+    freq: float
+    usage_percent: int
 
 
 class MemoryInfo(pydantic.BaseModel):
-    mem_total: int
-    mem_used: int
-    mem_free: int
-    mem_percent: float
+    total: int
+    used: int
+    free: int
+    usage_percent: float
+
+class DiskInfo(pydantic.BaseModel):
+    total: int
+    used: int
+    free: int
+    usage_percent: float
 
 
 class GPUInfo(pydantic.BaseModel):
@@ -72,6 +78,7 @@ class SystemInfo(pydantic.BaseModel):
     # 1 busy
     cpu: typing.Optional[CPUInfo]
     mem: typing.Optional[MemoryInfo]
+    disk: typing.Optional[DiskInfo]
     status: int = -1
     gpus: typing.List[GPUInfo] = []
 
