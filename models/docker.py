@@ -1,7 +1,7 @@
 from .inference import BaseInferenceEngine
 import subprocess
 import aiohttp
-
+import bittensor as bt
 from dataclasses import dataclass
 
 @dataclass  
@@ -32,6 +32,6 @@ class Ollama(BaseInferenceEngine):
                 }, timeout=120)
                 resp.raise_for_status()
         except Exception as e:
-            print(e)
+            bt.logging.error(e)
             return ""
         return resp.json()["response"]

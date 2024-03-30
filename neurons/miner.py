@@ -100,6 +100,7 @@ class Miner(BaseMinerNeuron):
         bt.logging.info(f"receive request: {synapse}")
         self.miner_state.set_state(1)
         result = await self.engine.inference(model=synapse.model, prompt=synapse.input)
+        print("inference result", result)
         self.miner_state.set_state(0)
         synapse.result = result
         return synapse
@@ -200,8 +201,3 @@ if __name__ == "__main__":
         while True:
             bt.logging.info("Miner running...", time.time())
             time.sleep(5)
-
-            # FIXME: remove these debugg codes
-            miner.miner_state.set_state(1)
-            time.sleep(5)
-            miner.miner_state.set_state(0)
