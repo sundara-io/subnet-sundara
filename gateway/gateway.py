@@ -53,6 +53,7 @@ app.add_middleware(
 
 @app.post("/chat")
 async def chat(input: Input):
+    gateway.sync()
     results = await gateway.inference(input)
     return {"results": results}
 
@@ -63,6 +64,7 @@ class Node:
 
 @app.get("/nodes")
 async def get_nodes():
+    gateway.sync()
     neurons = gateway.metagraph.neurons
     system_infos = await gateway.get_system_info()
     nodes = []
