@@ -2,7 +2,7 @@ import torch
 import random
 import bittensor as bt
 from typing import List
-from ..protocol import State
+from ..protocol import SystemInfoSynapse
 
 def check_uid_availability(
     metagraph: "bt.metagraph.Metagraph", uid: int, vpermit_tao_limit: int
@@ -91,7 +91,7 @@ async def get_idle_uids(
     
     state_resp = await self.dendrite(
             axons=[self.metagraph.axons[uid] for uid in candidate_uids],
-            synapse=State(),
+            synapse=SystemInfoSynapse(),
             deserialize=False,
     )
 

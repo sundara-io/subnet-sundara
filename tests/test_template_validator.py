@@ -24,7 +24,7 @@ import bittensor as bt
 from neurons.validator import Neuron as Validator
 from neurons.miner import Neuron as Miner
 
-from sundara.protocol import Inference
+from sundara.protocol import InferenceSynapse
 from sundara.validator.forward import forward
 from sundara.utils.uids import get_random_uids
 from sundara.validator.reward import get_rewards
@@ -70,7 +70,7 @@ class TemplateValidatorNeuronTestCase(unittest.TestCase):
                 self.neuron.metagraph.axons[uid] for uid in self.miner_uids
             ],
             # Construct a dummy query.
-            synapse=Inference(input=self.neuron.step),
+            synapse=InferenceSynapse(input=self.neuron.step),
             # All responses have the deserialize function called on them before returning.
             deserialize=True,
         )
@@ -84,7 +84,7 @@ class TemplateValidatorNeuronTestCase(unittest.TestCase):
             # Send the query to miners in the network.
             axons=[self.metagraph.axons[uid] for uid in self.miner_uids],
             # Construct a dummy query.
-            synapse=Inference(input=self.neuron.step),
+            synapse=InferenceSynapse(input=self.neuron.step),
             # All responses have the deserialize function called on them before returning.
             deserialize=True,
         )
@@ -100,7 +100,7 @@ class TemplateValidatorNeuronTestCase(unittest.TestCase):
             # Send the query to miners in the network.
             axons=[self.metagraph.axons[uid] for uid in self.miner_uids],
             # Construct a dummy query.
-            synapse=Inference(input=self.neuron.step),
+            synapse=InferenceSynapse(input=self.neuron.step),
             # All responses have the deserialize function called on them before returning.
             deserialize=True,
         )

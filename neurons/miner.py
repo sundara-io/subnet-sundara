@@ -27,8 +27,9 @@ import sundara
 # import base miner class which takes care of most of the boilerplate
 from sundara.base.miner import BaseMinerNeuron
 from models.docker import Ollama
-
+from sundara.utils.monitor import (get_cpu_info, get_gpu_infos, get_mem_info)
 from threading import Lock
+from sundara.protocol import SystemInfo
 
 class MinerState:
     def __init__(self) -> None:
@@ -60,15 +61,20 @@ class Miner(BaseMinerNeuron):
         # self.engine.start()
         self.miner_state = MinerState()
 
-    async def get_state(
-        self, synapse: sundara.protocol.State
-    ) -> sundara.protocol.State:
-        synapse.state = self.miner_state.get_state()
+    async def get_stats(
+        self, synapse: sundara.protocol.SystemInfoSynapse
+    ) -> sundara.protocol.SystemInfoSynapse:
+        synapse.system_info = SystemInfo(
+            status=self.miner_state.get_state(),
+            cpu = get_cpu_info(),
+            mem = get_mem_info(),
+            gpus = get_gpu_infos(),
+        )
         return synapse
 
     async def forward(
-        self, synapse: sundara.protocol.Inference
-    ) -> sundara.protocol.Inference:
+        self, synapse: sundara.protocol.InferenceSynapse
+    ) -> sundara.protocol.InferenceSynapse:
         """
         Processes the incoming 'Dummy' synapse by performing a predefined operation on the input data.
         This method should be replaced with actual logic relevant to the miner's purpose.
@@ -91,7 +97,7 @@ class Miner(BaseMinerNeuron):
         return synapse
 
     async def blacklist(
-        self, synapse: sundara.protocol.Inference
+        self, synapse: sundara.protocol.InferenceSynapse
     ) -> typing.Tuple[bool, str]:
         """
         Determines whether an incoming request should be blacklisted and thus ignored. Your implementation should
@@ -147,7 +153,7 @@ class Miner(BaseMinerNeuron):
         )
         return False, "Hotkey recognized!"
 
-    async def priority(self, synapse: sundara.protocol.Inference) -> float:
+    async def priority(self, synapse: sundara.protocol.InferenceSynapse) -> float:
         """
         The priority function determines the order in which requests are handled. More valuable or higher-priority
         requests are processed before others. You should design your own priority mechanism with care.

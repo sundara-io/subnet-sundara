@@ -3,3 +3,5 @@ torch
 aiohttp
 fastapi
 uvicorn
+gpustat
+psutil

@@ -19,7 +19,7 @@
 
 import bittensor as bt
 from typing import List, Optional, Union, Any, Dict
-from sundara.protocol import Inference
+from sundara.protocol import InferenceSynapse
 from bittensor.subnets import SubnetsAPI
 
 
@@ -29,8 +29,8 @@ class InferenceAPI(SubnetsAPI):
         self.netuid = 1
         self.name = "inference"
 
-    def prepare_synapse(self, inference_input: int) -> Inference:
-        synapse = Inference()
+    def prepare_synapse(self, inference_input: int) -> InferenceSynapse:
+        synapse = InferenceSynapse()
         synapse.input = inference_input
         return synapse
 

@@ -5,7 +5,7 @@ import uvicorn
 import bittensor as bt
 from sundara.utils.config import check_config, add_args, config
 from sundara.base.neuron import BaseNeuron
-from sundara.protocol import Inference, State
+from sundara.protocol import InferenceSynapse, SystemInfo, SystemInfoSynapse
 from pydantic import BaseModel
 from sundara.utils.uids import get_random_uids
 from neurons.validator import Validator
@@ -21,17 +21,17 @@ class Gateway(Validator):
         print([self.metagraph.axons[uid] for uid in miner_uids])
         responses = await self.dendrite(
             axons=[self.metagraph.axons[uid] for uid in miner_uids],
-            synapse=Inference(model=input.model, input=input.input),
+            synapse=InferenceSynapse(model=input.model, input=input.input),
             deserialize=True,
         )
         print(responses)
         return responses
     
-    async def get_states(self):
+    async def get_system_info(self):
         responses = await self.dendrite(
             axons=self.metagraph.axons,
-            synapse=State(),
-            deserialize=False,
+            synapse=SystemInfoSynapse(),
+            deserialize=True,
         )
         print(responses)
         return responses
@@ -50,15 +50,15 @@ async def chat(input: Input):
 @dataclass
 class Node:
     neuron: bt.NeuronInfo
-    state: int
+    system_info: SystemInfo
 
 @app.get("/nodes")
 async def get_nodes():
     neurons = gateway.metagraph.neurons
-    states = await gateway.get_states()
+    system_infos = await gateway.get_system_info()
     nodes = []
     for i, x in enumerate(neurons):
-        nodes.append(Node(neuron=x, state=states[i].state))
+        nodes.append(Node(neuron=x, system_info=system_infos[i]))
     return {"nodes": nodes}
 
 if __name__ == "__main__":

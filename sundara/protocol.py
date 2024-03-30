@@ -19,7 +19,9 @@
 
 import typing
 import bittensor as bt
-
+from dataclasses import dataclass, field
+import typing
+import pydantic
 # TODO(developer): Rewrite with your protocol definition.
 
 # This is the protocol for the dummy miner and validator.
@@ -39,15 +41,42 @@ import bittensor as bt
 #   dummy_output = dendrite.query( Dummy( dummy_input = 1 ) )
 #   assert dummy_output == 2
 
-class Inference(bt.Synapse):
+class InferenceSynapse(bt.Synapse):
     model: str
     input: str
     result: typing.Optional[str] = None
     def deserialize(self) -> int:
         return self.result
 
-class State(bt.Synapse):
+class CPUInfo(pydantic.BaseModel):
+    cpu_count: int
+    cpu_freq: float
+    cpu_percent: int
+
+
+class MemoryInfo(pydantic.BaseModel):
+    mem_total: int
+    mem_used: int
+    mem_free: int
+    mem_percent: float
+
+
+class GPUInfo(pydantic.BaseModel):
+    index: int
+    name: str
+    utilization: int
+
+class SystemInfo(pydantic.BaseModel):
     # -1 unknown
     # 0 idle
     # 1 busy
-    state: int = -1
+    cpu: typing.Optional[CPUInfo]
+    mem: typing.Optional[MemoryInfo]
+    status: int = -1
+    gpus: typing.List[GPUInfo] = []
+
+class SystemInfoSynapse(bt.Synapse):
+    system_info: typing.Optional[SystemInfo]
+
+    def deserialize(self) -> SystemInfo:
+        return self.system_info

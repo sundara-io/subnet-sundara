@@ -42,7 +42,7 @@ class BaseMinerNeuron(BaseNeuron):
         add_miner_args(cls, parser)
 
     @abstractmethod
-    async def get_state(self, synapse: bt.Synapse) -> bt.Synapse:
+    async def get_stats(self, synapse: bt.Synapse) -> bt.Synapse:
         ...
 
     def __init__(self, config=None):
@@ -68,7 +68,7 @@ class BaseMinerNeuron(BaseNeuron):
             blacklist_fn=self.blacklist,
             priority_fn=self.priority,
         ).attach(
-            forward_fn=self.get_state
+            forward_fn=self.get_stats
         )
         bt.logging.info(f"Axon created: {self.axon}")
 
