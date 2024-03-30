@@ -1,6 +1,6 @@
 from .inference import BaseInferenceEngine
 import subprocess
-import aiohttp
+import httpx
 import bittensor as bt
 from dataclasses import dataclass
 
@@ -24,14 +24,14 @@ class Ollama(BaseInferenceEngine):
 
     async def inference(self, model, prompt):
         try:
-            async with aiohttp.ClientSession() as session:
-                resp = session.post(f"{self.endpoint}/api/generate", json={
+            async with httpx.AsyncClient() as client:
+                resp = client.post(f"{self.endpoint}/api/generate", json={
                     "model": model,
                     "prompt": prompt,
                     "stream": False
                 }, timeout=120)
                 resp.raise_for_status()
-        except Exception as e:
+        except httpx.HTTPStatusError as e:
             bt.logging.error(e)
             return ""
         return resp.json()["response"]

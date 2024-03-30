@@ -5,3 +5,4 @@ fastapi
 uvicorn
 gpustat
 psutil
+httpx
