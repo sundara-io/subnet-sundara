@@ -21,6 +21,7 @@ import asyncio
 import threading
 import argparse
 import traceback
+import os
 
 import bittensor as bt
 from abc import ABC, abstractmethod
@@ -42,8 +43,7 @@ class BaseMinerNeuron(BaseNeuron):
         add_miner_args(cls, parser)
 
     @abstractmethod
-    async def get_stats(self, synapse: bt.Synapse) -> bt.Synapse:
-        ...
+    async def get_stats(self, synapse: bt.Synapse) -> bt.Synapse: ...
 
     def __init__(self, config=None):
         super().__init__(config=config)
@@ -57,9 +57,15 @@ class BaseMinerNeuron(BaseNeuron):
             bt.logging.warning(
                 "You are allowing non-registered entities to send requests to your miner. This is a security risk."
             )
-
+        external_ip = os.getenv("SUNDARA_MINER_EXTERNAL_IP")
+        external_port = os.getenv("SUNDARA_MINER_EXTERNAL_PORT")
         # The axon handles request processing, allowing validators to send this miner requests.
-        self.axon = bt.axon(wallet=self.wallet, config=self.config)
+        self.axon = bt.axon(
+            wallet=self.wallet,
+            config=self.config,
+            external_ip=external_ip,
+            external_port=int(external_port) if external_port else None,
+        )
 
         # Attach determiners which functions are called when servicing a request.
         bt.logging.info(f"Attaching forward function to miner axon.")
@@ -67,9 +73,7 @@ class BaseMinerNeuron(BaseNeuron):
             forward_fn=self.forward,
             blacklist_fn=self.blacklist,
             priority_fn=self.priority,
-        ).attach(
-            forward_fn=self.get_stats
-        )
+        ).attach(forward_fn=self.get_stats)
         bt.logging.info(f"Axon created: {self.axon}")
 
         # Instantiate runners
