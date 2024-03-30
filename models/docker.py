@@ -25,7 +25,7 @@ class Ollama(BaseInferenceEngine):
     async def inference(self, model, prompt):
         try:
             async with httpx.AsyncClient() as client:
-                resp = client.post(f"{self.endpoint}/api/generate", json={
+                resp = await client.post(f"{self.endpoint}/api/generate", json={
                     "model": model,
                     "prompt": prompt,
                     "stream": False
