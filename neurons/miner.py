@@ -16,7 +16,7 @@
 # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
-
+import os
 import time
 import typing
 import bittensor as bt
@@ -63,8 +63,9 @@ class Miner(BaseMinerNeuron):
 
     def __init__(self, config=None):
         super(Miner, self).__init__(config=config)
-        # self.engine = Ollama()
-        # self.engine.start()
+        self.engine = Ollama()
+        if not os.getenv("SUNDARA_DISABLE_INFERENCE_ENGINE"):
+            self.engine.start()
         self.miner_state = MinerState()
 
     async def get_stats(
