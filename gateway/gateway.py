@@ -1,6 +1,8 @@
 from dataclasses import dataclass, asdict
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 import uvicorn
 import bittensor as bt
 from sundara.utils.config import check_config, add_args, config
@@ -40,6 +42,13 @@ gateway = Gateway()
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.post("/chat")
