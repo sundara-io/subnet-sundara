@@ -41,9 +41,12 @@ async def forward(self):
         # Send the query to selected miner axons in the network.
         axons=[self.metagraph.axons[uid] for uid in miner_uids],
         # Construct a dummy query. This simply contains a single integer.
-        synapse=InferenceSynapse(dict(
-            model="llama2", 
-            prompt=f"reply me with only the text '{self.step}', without any newline character")),
+        synapse=InferenceSynapse(
+            input=dict(
+                model="llama2",
+                prompt=f"reply me with only the text '{self.step}', without any newline character",
+            )
+        ),
         # All responses have the deserialize function called on them before returning.
         # You are encouraged to define your own deserialization function.
         deserialize=True,
