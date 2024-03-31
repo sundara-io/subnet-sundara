@@ -141,7 +141,6 @@ class BaseMinerNeuron(BaseNeuron):
         # If someone intentionally stops the miner, it'll safely terminate operations.
         except KeyboardInterrupt:
             self.axon.stop()
-            self.stop()
             bt.logging.success("Miner killed by keyboard interrupt.")
             exit()
 
@@ -170,6 +169,7 @@ class BaseMinerNeuron(BaseNeuron):
             bt.logging.debug("Stopping miner in background thread.")
             self.should_exit = True
             self.thread.join(5)
+            self.stop()
             self.is_running = False
             bt.logging.debug("Stopped")
 
