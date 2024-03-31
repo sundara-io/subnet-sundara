@@ -43,15 +43,16 @@ class Ollama(BaseInferenceEngine):
             )
             bt.logging.info(f"loading model {self.model_name}")
 
-            resp = httpx.post(
+            with httpx.stream(
+                "POST",
                 f"{self.endpoint}/api/pull",
                 json={
                     "model": self.model_name,
-                },
-            )
-            for line in resp.iter_bytes(chunk_size=128):
-                bt.logging.info(f"ollama resp: {line}")
-            resp.raise_for_status()
+                    "stream": True,
+                },) as resp:
+                for line in resp.iter_lines():
+                    bt.logging.info(f"ollama resp: {line}")
+                resp.raise_for_status()
         except Exception as e:
             bt.logging.error(e)
 
