@@ -22,12 +22,15 @@ import bittensor as bt
 import typing
 import pydantic
 
+
 class InferenceSynapse(bt.Synapse):
-    meta: dict
+    meta: dict = {}
     input: dict
     output: typing.Optional[dict] = None
+
     def deserialize(self) -> dict:
         return self.output
+
 
 class CPUInfo(pydantic.BaseModel):
     count: int
@@ -41,6 +44,7 @@ class MemoryInfo(pydantic.BaseModel):
     free: int
     usage_percent: float
 
+
 class DiskInfo(pydantic.BaseModel):
     total: int
     used: int
@@ -53,6 +57,7 @@ class GPUInfo(pydantic.BaseModel):
     name: str
     utilization: int
 
+
 class SystemInfo(pydantic.BaseModel):
     # -1 unknown
     # 0 idle
@@ -62,6 +67,7 @@ class SystemInfo(pydantic.BaseModel):
     disk: typing.Optional[DiskInfo]
     status: int = -1
     gpus: typing.List[GPUInfo] = []
+
 
 class SystemInfoSynapse(bt.Synapse):
     system_info: typing.Optional[SystemInfo]
