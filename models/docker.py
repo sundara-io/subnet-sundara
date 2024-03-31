@@ -34,7 +34,7 @@ class Ollama(BaseInferenceEngine):
                     "--rm",
                     "-d",
                     "--name",
-                    self.model_name,
+                    self.container_name,
                     "-p",
                     f"{self.port}:{self.port}",
                     "-e",
