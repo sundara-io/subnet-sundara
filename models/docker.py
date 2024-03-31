@@ -80,4 +80,4 @@ class Ollama(BaseInferenceEngine):
         except httpx.HTTPStatusError as e:
             bt.logging.error(e)
             return ""
-        return resp.json()["response"]
+        return resp.json()

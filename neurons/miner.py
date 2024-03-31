@@ -104,7 +104,7 @@ class Miner(BaseMinerNeuron):
         result = await self.engine.inference(synapse.input)
         print("inference result", result)
         self.miner_state.set_state(0)
-        synapse.result = result
+        synapse.output = result
         return synapse
 
     async def blacklist(

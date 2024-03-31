@@ -55,7 +55,10 @@ app.add_middleware(
 
 @app.post("/chat")
 async def chat(input: Input):
-    results = await gateway.inference(input)
+    resps = await gateway.inference(input)
+    results = []
+    for resp in resps:
+        results.append(resp["response"])
     return {"results": results}
 
 
