@@ -52,15 +52,6 @@ class MinerState:
 
 
 class Miner(BaseMinerNeuron):
-    """
-    Your miner neuron
-        ) class. You should use this class to define your miner's behavior. In particular, you should replace the forward function with your own logic. You may also want to override the blacklist and priority functions according to your needs.
-
-    This class inherits from the BaseMinerNeuron class, which in turn inherits from BaseNeuron. The BaseNeuron class takes care of routine tasks such as setting up wallet, subtensor, metagraph, logging directory, parsing config, etc. You can override any of the methods in BaseNeuron if you need to customize the behavior.
-
-    This class provides reasonable default behavior for a miner such as blacklisting unrecognized hotkeys, prioritizing requests based on stake, and forwarding requests to the forward function. If you need to define custom
-    """
-
     def __init__(self, config=None):
         super(Miner, self).__init__(config=config)
         self.engine = Ollama()
@@ -86,23 +77,10 @@ class Miner(BaseMinerNeuron):
     async def forward(
         self, synapse: sundara.protocol.InferenceSynapse
     ) -> sundara.protocol.InferenceSynapse:
-        """
-        Processes the incoming 'Dummy' synapse by performing a predefined operation on the input data.
-        This method should be replaced with actual logic relevant to the miner's purpose.
-
-        Args:
-            synapse (template.protocol.Dummy): The synapse object containing the 'dummy_input' data.
-
-        Returns:
-            template.protocol.Dummy: The synapse object with the 'dummy_output' field set to twice the 'dummy_input' value.
-
-        The 'forward' function is a placeholder and should be overridden with logic that is appropriate for
-        the miner's intended operation. This method demonstrates a basic transformation of input data.
-        """
         bt.logging.info(f"receive request: {synapse}")
         self.miner_state.set_state(1)
         result = await self.engine.inference(synapse.input)
-        print("inference result", result)
+        bt.logging.info("inference result", result)
         self.miner_state.set_state(0)
         synapse.output = result
         return synapse
