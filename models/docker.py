@@ -17,7 +17,7 @@ class Ollama(BaseInferenceEngine):
 
     def start(self):
         try:
-            bt.logging.info("start ollama instance")
+            bt.logging.info("starting ollama instance")
             subprocess.run(["docker", "run", "--gpus", "all", "--rm", "-d", "--name", self.model_name, "-p", f"{self.port}:{self.port}", 
                         "-e", f"OLLAMA_HOST=0.0.0.0:{self.port}", "-e", "OLLAMA_MODELS=/data/", "-v", f"/tmp/sundara/ollama/{self.model_name}:/data",self.model_image, "serve"])
             bt.logging.info(f"loading model {self.model_name}")
@@ -29,6 +29,7 @@ class Ollama(BaseInferenceEngine):
             bt.logging.error(e)
 
     def stop(self):
+        bt.logging.info("stopping ollama instance")
         subprocess.run["docker", "rm", "-f", self.model_name]
 
     async def inference(self, model, prompt):
