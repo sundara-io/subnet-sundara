@@ -19,34 +19,15 @@
 
 import typing
 import bittensor as bt
-from dataclasses import dataclass, field
 import typing
 import pydantic
-# TODO(developer): Rewrite with your protocol definition.
-
-# This is the protocol for the dummy miner and validator.
-# It is a simple request-response protocol where the validator sends a request
-# to the miner, and the miner responds with a dummy response.
-
-# ---- miner ----
-# Example usage:
-#   def dummy( synapse: Dummy ) -> Dummy:
-#       synapse.dummy_output = synapse.dummy_input + 1
-#       return synapse
-#   axon = bt.axon().attach( dummy ).serve(netuid=...).start()
-
-# ---- validator ---
-# Example usage:
-#   dendrite = bt.dendrite()
-#   dummy_output = dendrite.query( Dummy( dummy_input = 1 ) )
-#   assert dummy_output == 2
 
 class InferenceSynapse(bt.Synapse):
-    model: str
-    input: str
-    result: typing.Optional[str] = None
-    def deserialize(self) -> int:
-        return self.result
+    meta: dict
+    input: dict
+    output: typing.Optional[dict] = None
+    def deserialize(self) -> dict:
+        return self.output
 
 class CPUInfo(pydantic.BaseModel):
     count: int

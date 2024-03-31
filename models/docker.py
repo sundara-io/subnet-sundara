@@ -9,7 +9,7 @@ SUNDARA_CONTAINER_PREFIX = "sundara_model__"
 
 @dataclass
 class Ollama(BaseInferenceEngine):
-    model_image = "ollama/ollama"
+    image_name = "ollama/ollama"
     model_name = "llama2"
     host = "127.0.0.1"
     port = 11434
@@ -43,7 +43,7 @@ class Ollama(BaseInferenceEngine):
                     "OLLAMA_MODELS=/data/",
                     "-v",
                     f"/tmp/sundara/ollama/{self.model_name}:/data",
-                    self.model_image,
+                    self.image_name,
                     "serve",
                 ]
             )
@@ -67,12 +67,14 @@ class Ollama(BaseInferenceEngine):
         bt.logging.info("stopping ollama instance")
         subprocess.run(["docker", "rm", "-f", self.container_name])
 
-    async def inference(self, model, prompt):
+    async def inference(self, model, input:dict):
+        input["model"] = model
+        input["stream"] = True
         try:
             async with httpx.AsyncClient() as client:
                 resp = await client.post(
                     f"{self.endpoint}/api/generate",
-                    json={"model": model, "prompt": prompt, "stream": False},
+                    json=input,
                     timeout=120,
                 )
                 resp.raise_for_status()

@@ -102,7 +102,7 @@ class Miner(BaseMinerNeuron):
         # TODO(developer): Replace with actual implementation logic.
         bt.logging.info(f"receive request: {synapse}")
         self.miner_state.set_state(1)
-        result = await self.engine.inference(model=synapse.model, prompt=synapse.input)
+        result = await self.engine.inference(synapse.input)
         print("inference result", result)
         self.miner_state.set_state(0)
         synapse.result = result

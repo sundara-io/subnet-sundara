@@ -23,7 +23,7 @@ class Gateway(Validator):
         self.sync()
         responses = await self.dendrite(
             axons=self.metagraph.axons,
-            synapse=InferenceSynapse(model=input.model, input=input.input),
+            synapse=InferenceSynapse(input={"model": input.model, "prompt": input.input}),
             deserialize=True,
         )
         print(responses)
