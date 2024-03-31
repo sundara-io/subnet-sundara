@@ -89,15 +89,15 @@ async def get_idle_uids(
             if uid_is_not_excluded:
                 candidate_uids.append(uid)
     
-    state_resp = await self.dendrite(
+    system_infos = await self.dendrite(
             axons=[self.metagraph.axons[uid] for uid in candidate_uids],
             synapse=SystemInfoSynapse(),
-            deserialize=False,
+            deserialize=True,
     )
 
     idle_uids = []
-    for i, s in enumerate(state_resp):
-        if s.state == 0:
+    for i, s in enumerate(system_infos):
+        if s and s.status == 0:
             idle_uids.append(candidate_uids[i])
 
     # If k is larger than the number of available uids, set k to the number of available uids.

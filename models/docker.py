@@ -7,7 +7,7 @@ from dataclasses import dataclass
 @dataclass  
 class Ollama(BaseInferenceEngine):
     model_image = "ollama/ollama"
-    model_name = "ollama"
+    model_name = "llama2"
     host = "127.0.0.1"
     port = 11434
 
@@ -16,8 +16,17 @@ class Ollama(BaseInferenceEngine):
         return f"http://{self.host}:{self.port}"
 
     def start(self):
-        subprocess.run(["docker", "run", "--gpus", "all", "--rm", "-d", "--name", self.model_name, "-p", f"{self.port}:{self.port}", 
-                    "-e", "OLLAMA_HOST=0.0.0.0:11434", "-e", "OLLAMA_MODELS=/data/", "-v", "/tmp/ollama:/data",self.model_image, "serve"])
+        try:
+            bt.logging.info("start ollama instance")
+            subprocess.run(["docker", "run", "--gpus", "all", "--rm", "-d", "--name", self.model_name, "-p", f"{self.port}:{self.port}", 
+                        "-e", f"OLLAMA_HOST=0.0.0.0:{self.port}", "-e", "OLLAMA_MODELS=/data/", "-v", f"/tmp/sundara/ollama/{self.model_name}:/data",self.model_image, "serve"])
+            bt.logging.info(f"loading model {self.model_name}")
+            resp = httpx.post(f"{self.endpoint}/api/pull", json={
+                    "model": self.model_name,
+                })
+            resp.raise_for_status()
+        except Exception as e:
+            bt.logging.error(e)
 
     def stop(self):
         subprocess.run["docker", "rm", "-f", self.model_name]

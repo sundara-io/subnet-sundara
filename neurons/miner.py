@@ -68,6 +68,9 @@ class Miner(BaseMinerNeuron):
             self.engine.start()
         self.miner_state = MinerState()
 
+    def stop(self):
+        self.engine.stop()
+
     async def get_stats(
         self, synapse: sundara.protocol.SystemInfoSynapse
     ) -> sundara.protocol.SystemInfoSynapse:
