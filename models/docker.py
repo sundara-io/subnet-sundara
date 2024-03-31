@@ -58,7 +58,7 @@ class Ollama(BaseInferenceEngine):
 
     def stop(self):
         bt.logging.info("stopping ollama instance")
-        subprocess.run["docker", "rm", "-f", self.model_name]
+        subprocess.run(["docker", "rm", "-f", self.model_name])
 
     async def inference(self, model, prompt):
         try:
