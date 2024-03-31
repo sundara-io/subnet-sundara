@@ -13,17 +13,17 @@ from sundara.utils.uids import get_random_uids
 from neurons.validator import Validator
 
 
-class Input(BaseModel):
+class ChatInput(BaseModel):
     model: str
     input: str = ""
 
 
 class Gateway(Validator):
-    async def inference(self, input: dict):
+    async def inference(self, input: dict, meta: dict = None):
         self.sync()
         responses = await self.dendrite(
             axons=self.metagraph.axons,
-            synapse=InferenceSynapse(input=input),
+            synapse=InferenceSynapse(meta=meta, input=input),
             deserialize=True,
         )
         print(responses)
@@ -53,9 +53,14 @@ app.add_middleware(
 )
 
 
+class InferenceReq(BaseModel):
+    meta: dict = {}
+    input: dict
+
+
 @app.post("/chat")
-async def chat(input: Input):
-    resps = await gateway.inference({"model": input.model, "prompt": input.input})
+async def chat(input: ChatInput):
+    resps = await gateway.inference(input={"model": input.model, "prompt": input.input})
     results = []
     for resp in resps:
         if resp:
@@ -66,8 +71,8 @@ async def chat(input: Input):
 
 
 @app.post("/inference")
-async def chat(input: dict):
-    resps = await gateway.inference(input)
+async def inference(req: InferenceReq):
+    resps = await gateway.inference(meta=req.meta, input=req.input)
     results = []
     for resp in resps:
         results.append(resp)
