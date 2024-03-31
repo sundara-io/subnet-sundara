@@ -69,15 +69,11 @@ class Ollama(BaseInferenceEngine):
 
     async def inference(self, input: dict):
         input["stream"] = True
-        try:
-            async with httpx.AsyncClient() as client:
-                resp = await client.post(
-                    f"{self.endpoint}/api/generate",
-                    json=input,
-                    timeout=120,
-                )
-                resp.raise_for_status()
-        except httpx.HTTPStatusError as e:
-            bt.logging.error(e)
-            return ""
+        async with httpx.AsyncClient() as client:
+            resp = await client.post(
+                f"{self.endpoint}/api/generate",
+                json=input,
+                timeout=120,
+            )
+            resp.raise_for_status()
         return resp.json()
