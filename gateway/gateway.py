@@ -19,11 +19,11 @@ class Input(BaseModel):
 
 
 class Gateway(Validator):
-    async def inference(self, input: Input):
+    async def inference(self, input: dict):
         self.sync()
         responses = await self.dendrite(
             axons=self.metagraph.axons,
-            synapse=InferenceSynapse(input={"model": input.model, "prompt": input.input}),
+            synapse=InferenceSynapse(input=input),
             deserialize=True,
         )
         print(responses)
@@ -55,10 +55,18 @@ app.add_middleware(
 
 @app.post("/chat")
 async def chat(input: Input):
-    resps = await gateway.inference(input)
+    resps = await gateway.inference({"model": input.model, "prompt": input.input})
     results = []
     for resp in resps:
         results.append(resp["response"])
+    return {"results": results}
+
+@app.post("/inference")
+async def chat(input: dict):
+    resps = await gateway.inference(input)
+    results = []
+    for resp in resps:
+        results.append(resp)
     return {"results": results}
 
 
