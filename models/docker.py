@@ -4,6 +4,8 @@ import httpx
 import bittensor as bt
 from dataclasses import dataclass
 
+SUNDARA_CONTAINER_PREFIX = "sundara_model__"
+
 
 @dataclass
 class Ollama(BaseInferenceEngine):
@@ -15,6 +17,10 @@ class Ollama(BaseInferenceEngine):
     @property
     def endpoint(self):
         return f"http://{self.host}:{self.port}"
+
+    @property
+    def container_name(self):
+        return SUNDARA_CONTAINER_PREFIX + self.model_name
 
     def start(self):
         try:
@@ -49,7 +55,8 @@ class Ollama(BaseInferenceEngine):
                 json={
                     "model": self.model_name,
                     "stream": True,
-                },) as resp:
+                },
+            ) as resp:
                 for line in resp.iter_lines():
                     bt.logging.info(f"ollama: {line}")
                 resp.raise_for_status()
@@ -58,7 +65,7 @@ class Ollama(BaseInferenceEngine):
 
     def stop(self):
         bt.logging.info("stopping ollama instance")
-        subprocess.run(["docker", "rm", "-f", self.model_name])
+        subprocess.run(["docker", "rm", "-f", self.container_name])
 
     async def inference(self, model, prompt):
         try:
