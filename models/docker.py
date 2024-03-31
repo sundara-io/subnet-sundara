@@ -51,7 +51,7 @@ class Ollama(BaseInferenceEngine):
                     "stream": True,
                 },) as resp:
                 for line in resp.iter_lines():
-                    bt.logging.info(f"ollama resp: {line}")
+                    bt.logging.info(f"ollama: {line}")
                 resp.raise_for_status()
         except Exception as e:
             bt.logging.error(e)
