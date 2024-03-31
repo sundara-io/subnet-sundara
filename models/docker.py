@@ -4,7 +4,8 @@ import httpx
 import bittensor as bt
 from dataclasses import dataclass
 
-@dataclass  
+
+@dataclass
 class Ollama(BaseInferenceEngine):
     model_image = "ollama/ollama"
     model_name = "llama2"
@@ -18,16 +19,39 @@ class Ollama(BaseInferenceEngine):
     def start(self):
         try:
             bt.logging.info("starting ollama instance")
-            subprocess.run(["docker", "run", "--gpus", "all", "--rm", "-d", "--name", self.model_name, "-p", f"{self.port}:{self.port}", 
-                        "-e", f"OLLAMA_HOST=0.0.0.0:{self.port}", "-e", "OLLAMA_MODELS=/data/", "-v", f"/tmp/sundara/ollama/{self.model_name}:/data",self.model_image, "serve"])
+            subprocess.run(
+                [
+                    "docker",
+                    "run",
+                    "--gpus",
+                    "all",
+                    "--rm",
+                    "-d",
+                    "--name",
+                    self.model_name,
+                    "-p",
+                    f"{self.port}:{self.port}",
+                    "-e",
+                    f"OLLAMA_HOST=0.0.0.0:{self.port}",
+                    "-e",
+                    "OLLAMA_MODELS=/data/",
+                    "-v",
+                    f"/tmp/sundara/ollama/{self.model_name}:/data",
+                    self.model_image,
+                    "serve",
+                ]
+            )
             bt.logging.info(f"loading model {self.model_name}")
 
-            resp = httpx.post(f"{self.endpoint}/api/pull", json={
+            resp = httpx.post(
+                f"{self.endpoint}/api/pull",
+                json={
                     "model": self.model_name,
-                })
-            resp.raise_for_status()
+                },
+            )
             for line in resp.iter_text(chunk_size=128):
                 bt.logging.info(f"ollama resp: {line}")
+            resp.raise_for_status()
         except Exception as e:
             bt.logging.error(e)
 
@@ -38,11 +62,11 @@ class Ollama(BaseInferenceEngine):
     async def inference(self, model, prompt):
         try:
             async with httpx.AsyncClient() as client:
-                resp = await client.post(f"{self.endpoint}/api/generate", json={
-                    "model": model,
-                    "prompt": prompt,
-                    "stream": False
-                }, timeout=120)
+                resp = await client.post(
+                    f"{self.endpoint}/api/generate",
+                    json={"model": model, "prompt": prompt, "stream": False},
+                    timeout=120,
+                )
                 resp.raise_for_status()
         except httpx.HTTPStatusError as e:
             bt.logging.error(e)
