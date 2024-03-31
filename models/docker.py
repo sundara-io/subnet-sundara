@@ -49,7 +49,7 @@ class Ollama(BaseInferenceEngine):
                     "model": self.model_name,
                 },
             )
-            for line in resp.iter_text(chunk_size=128):
+            for line in resp.iter_lines():
                 bt.logging.info(f"ollama resp: {line}")
             resp.raise_for_status()
         except Exception as e:
