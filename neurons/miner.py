@@ -99,7 +99,6 @@ class Miner(BaseMinerNeuron):
         The 'forward' function is a placeholder and should be overridden with logic that is appropriate for
         the miner's intended operation. This method demonstrates a basic transformation of input data.
         """
-        # TODO(developer): Replace with actual implementation logic.
         bt.logging.info(f"receive request: {synapse}")
         self.miner_state.set_state(1)
         result = await self.engine.inference(synapse.input)

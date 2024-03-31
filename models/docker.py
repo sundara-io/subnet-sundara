@@ -67,8 +67,7 @@ class Ollama(BaseInferenceEngine):
         bt.logging.info("stopping ollama instance")
         subprocess.run(["docker", "rm", "-f", self.container_name])
 
-    async def inference(self, model, input:dict):
-        input["model"] = model
+    async def inference(self, input: dict):
         input["stream"] = True
         try:
             async with httpx.AsyncClient() as client:
