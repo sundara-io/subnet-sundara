@@ -68,7 +68,7 @@ class Ollama(BaseInferenceEngine):
         subprocess.run(["docker", "rm", "-f", self.container_name])
 
     async def inference(self, input: dict):
-        input["stream"] = True
+        input["stream"] = False
         bt.logging.debug("inference input", input)
         async with httpx.AsyncClient() as client:
             resp = await client.post(
