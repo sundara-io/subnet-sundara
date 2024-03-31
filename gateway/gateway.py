@@ -58,8 +58,12 @@ async def chat(input: Input):
     resps = await gateway.inference({"model": input.model, "prompt": input.input})
     results = []
     for resp in resps:
-        results.append(resp["response"])
+        if resp:
+            results.append(resp["response"])
+        else:
+            results.append(None)
     return {"results": results}
+
 
 @app.post("/inference")
 async def chat(input: dict):
