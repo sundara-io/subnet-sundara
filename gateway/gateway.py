@@ -25,6 +25,7 @@ class Gateway(Validator):
             axons=self.metagraph.axons,
             synapse=InferenceSynapse(meta=meta, input=input),
             deserialize=True,
+            timeout=5.0
         )
         print(responses)
         return responses
@@ -35,6 +36,7 @@ class Gateway(Validator):
             axons=self.metagraph.axons,
             synapse=SystemInfoSynapse(),
             deserialize=True,
+            timeout=5.0
         )
         print(responses)
         return responses
