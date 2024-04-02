@@ -21,11 +21,13 @@ class ChatInput(BaseModel):
 class Gateway(Validator):
     async def inference(self, input: dict, meta: dict = None):
         self.sync()
+        if not meta:
+            meta = {}
         responses = await self.dendrite(
             axons=self.metagraph.axons,
             synapse=InferenceSynapse(meta=meta, input=input),
             deserialize=True,
-            timeout=5.0
+            timeout=meta.get("timeout", 5.0)
         )
         print(responses)
         return responses
