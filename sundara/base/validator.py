@@ -96,6 +96,7 @@ class BaseValidatorNeuron(BaseNeuron):
                 external_port=int(external_port) if external_port else None,
             )
 
+            bt.logging.info(f"Attaching forward function to validator axon.")
             self.axon.attach(forward_fn=self.get_stats)
             bt.logging.info(f"Axon created: {self.axon}")
 
@@ -143,6 +144,10 @@ class BaseValidatorNeuron(BaseNeuron):
 
         # Check that validator is registered on the network.
         self.sync()
+
+
+        # Start  starts the miner's axon, making it active on the network.
+        self.axon.start()
 
         bt.logging.info(f"Validator starting at block: {self.block}")
 
