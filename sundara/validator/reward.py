@@ -31,7 +31,7 @@ def reward(query: int, response: dict) -> float:
     - float: The reward value for the miner.
     """
 
-    return 1.0 if response["response"] == str(query) else 0
+    return 1.0 if response and response["response"] == str(query) else 0
 
 
 def get_rewards(
