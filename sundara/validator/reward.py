@@ -20,9 +20,9 @@
 import torch
 from typing import List
 import re
+from sundara.protocol import InferenceSynapse
 
-
-def reward(query: int, response: dict) -> float:
+def reward(query: int, response: InferenceSynapse) -> float:
     """
     Reward the miner response to the dummy request. This method returns a reward
     value for the miner, which is used to update the miner's score.
@@ -30,7 +30,7 @@ def reward(query: int, response: dict) -> float:
     Returns:
     - float: The reward value for the miner.
     """
-
+    response.axon.process_time
     return 1.0 if response and response["response"] == str(query) else 0
 
 
