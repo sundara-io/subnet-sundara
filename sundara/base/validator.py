@@ -96,6 +96,9 @@ class BaseValidatorNeuron(BaseNeuron):
                 external_port=int(external_port) if external_port else None,
             )
 
+            self.axon.attach(forward_fn=self.get_stats)
+            bt.logging.info(f"Axon created: {self.axon}")
+
             try:
                 self.subtensor.serve_axon(
                     netuid=self.config.netuid,

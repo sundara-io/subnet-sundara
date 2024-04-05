@@ -10,7 +10,7 @@ from sundara.base.neuron import BaseNeuron
 from sundara.protocol import InferenceSynapse, SystemInfo, SystemInfoSynapse
 from pydantic import BaseModel
 from sundara.utils.uids import get_random_uids
-from neurons.validator import Validator
+from neurons.gateway import GatewayNeuron
 
 
 class ChatInput(BaseModel):
@@ -18,7 +18,7 @@ class ChatInput(BaseModel):
     input: str = ""
 
 
-class Gateway(Validator):
+class Gateway(GatewayNeuron):
     async def inference(self, input: dict, meta: dict = None):
         self.sync()
         if not meta:

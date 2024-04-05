@@ -27,7 +27,8 @@ from sundara.utils.config import check_config, add_args, config
 from sundara.utils.misc import ttl_get_block
 from sundara import __spec_version__ as spec_version
 from sundara.mock import MockSubtensor, MockMetagraph
-
+from sundara.utils.monitor import (get_cpu_info, get_disk_info, get_gpu_infos, get_mem_info)
+from sundara.protocol import SystemInfoSynapse, SystemInfo
 
 class BaseNeuron(ABC):
     """
@@ -58,6 +59,18 @@ class BaseNeuron(ABC):
     @property
     def block(self):
         return ttl_get_block(self)
+
+    async def get_stats(
+        self, synapse: SystemInfoSynapse
+    ) -> SystemInfoSynapse:
+        synapse.system_info = SystemInfo(
+            status=-2,
+            cpu=get_cpu_info(),
+            mem=get_mem_info(),
+            disk=get_disk_info(),
+            gpus=get_gpu_infos(),
+        )
+        return synapse
 
     def __init__(self, config=None):
         base_config = copy.deepcopy(config or BaseNeuron.config())

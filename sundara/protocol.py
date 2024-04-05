@@ -59,9 +59,10 @@ class GPUInfo(pydantic.BaseModel):
 
 
 class SystemInfo(pydantic.BaseModel):
+    # -2 i'm validator
     # -1 unknown
-    # 0 idle
-    # 1 busy
+    # 0 miner idle
+    # 1 miner busy
     cpu: typing.Optional[CPUInfo]
     mem: typing.Optional[MemoryInfo]
     disk: typing.Optional[DiskInfo]
@@ -74,3 +75,11 @@ class SystemInfoSynapse(bt.Synapse):
 
     def deserialize(self) -> SystemInfo:
         return self.system_info
+
+class APIInferenceSynapse(bt.Synapse):
+    meta: dict = {}
+    input: dict
+    output: typing.Optional[dict] = None
+
+    def deserialize(self) -> dict:
+        return self.output

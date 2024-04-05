@@ -235,6 +235,19 @@ def add_validator_args(cls, parser):
         default="opentensor-dev",
     )
 
+    parser.add_argument(
+        "--gateway.allowed_hotkeys",
+        type=str,
+        help="The hotkeys which allowed to call api, separated with comma",
+        default="",
+    )
+
+    parser.add_argument(
+        "--gateway.insecure_public",
+        type=bool,
+        help="Allow all calls from any hotkeys",
+        default="",
+    )
 
 def config(cls):
     """
