@@ -1,26 +1,30 @@
-from .inference import BaseInferenceEngine
 import subprocess
 import httpx
 import bittensor as bt
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 SUNDARA_CONTAINER_PREFIX = "sundara_model__"
 
 
 @dataclass
-class Ollama(BaseInferenceEngine):
+class Ollama:
     image_name = "ollama/ollama"
-    model_name = "llama2"
     host = "127.0.0.1"
     port = 11434
+    models = list[str] = field(default_factory=list)
+
+    @property
+    def name(self):
+        return self.__class__.__name__.lower()
 
     @property
     def endpoint(self):
         return f"http://{self.host}:{self.port}"
+        
 
     @property
     def container_name(self):
-        return SUNDARA_CONTAINER_PREFIX + self.model_name
+        return SUNDARA_CONTAINER_PREFIX + self.name
 
     def start(self):
         try:
@@ -42,24 +46,30 @@ class Ollama(BaseInferenceEngine):
                     "-e",
                     "OLLAMA_MODELS=/data/",
                     "-v",
-                    f"/tmp/sundara/ollama/{self.model_name}:/data",
+                    f"/tmp/sundara/engine/{self.name}:/data",
                     self.image_name,
                     "serve",
                 ]
             )
-            bt.logging.info(f"loading model {self.model_name}")
+            bt.logging.info(f"loading models")
 
-            with httpx.stream(
-                "POST",
-                f"{self.endpoint}/api/pull",
-                json={
-                    "model": self.model_name,
-                    "stream": True,
-                },
-            ) as resp:
-                for line in resp.iter_lines():
-                    bt.logging.info(f"ollama: {line}")
-                resp.raise_for_status()
+            for model_name in self.models:
+                try:
+                    bt.logging.info(f"loading model {model_name}")
+                    with httpx.stream(
+                        "POST",
+                        f"{self.endpoint}/api/pull",
+                        json={
+                            "model": model_name,
+                            "stream": True,
+                        },
+                    ) as resp:
+                        for line in resp.iter_lines():
+                            bt.logging.info(f"ollama: {line}")
+                        resp.raise_for_status()
+                except httpx.HTTPStatusError as e:
+                    bt.logging.error(e)
+                    pass
         except Exception as e:
             bt.logging.error(e)
 

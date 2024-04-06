@@ -26,7 +26,7 @@ import sundara
 
 # import base miner class which takes care of most of the boilerplate
 from sundara.base.miner import BaseMinerNeuron
-from models.docker import Ollama
+from engine import get_engine_factory_by_name
 from sundara.utils.monitor import (
     get_cpu_info,
     get_gpu_infos,
@@ -54,7 +54,7 @@ class MinerState:
 class Miner(BaseMinerNeuron):
     def __init__(self, config=None):
         super(Miner, self).__init__(config=config)
-        self.engine = Ollama()
+        self.engine = get_engine_factory_by_name(config.engine.name)(models=config.engine.models)
         if not os.getenv("SUNDARA_DISABLE_INFERENCE_ENGINE"):
             self.engine.start()
         self.miner_state = MinerState()

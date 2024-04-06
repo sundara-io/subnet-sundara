@@ -119,6 +119,20 @@ def add_args(cls, parser):
         default="",
     )
 
+    parser.add_argument(
+        "--engine.name",
+        type=str,
+        help="The name of inference engine. options: ollama",
+        default="",
+    )
+
+    parser.add_argument(
+        "--engine.models",
+        nargs="+",
+        type=list,
+        help="models",
+        default=["ollama2"],
+    )
 
 def add_miner_args(cls, parser):
     """Add miner specific arguments to the parser."""
@@ -237,9 +251,10 @@ def add_validator_args(cls, parser):
 
     parser.add_argument(
         "--gateway.allowed_hotkeys",
-        type=str,
-        help="The hotkeys which allowed to call api, separated with comma",
-        default="",
+        nargs="+",
+        type=list,
+        help="The hotkeys which allowed to call api",
+        default=[],
     )
 
     parser.add_argument(
@@ -248,6 +263,7 @@ def add_validator_args(cls, parser):
         help="Allow all calls from any hotkeys",
         default="",
     )
+
 
 def config(cls):
     """

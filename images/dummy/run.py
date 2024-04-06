@@ -9,7 +9,7 @@ def health():
 
 @app.route("/inference", methods=['POST'])
 def inference():
-    return jsonify({"model": "dummy", "result": "base64"})
+    return jsonify(request.json())
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
