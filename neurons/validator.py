@@ -19,6 +19,7 @@
 
 
 import time
+import typing
 
 # Bittensor
 import bittensor as bt
