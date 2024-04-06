@@ -18,7 +18,6 @@ class ChatInput(BaseModel):
 
 class Gateway(API):
     async def inference(self, input: dict, meta: dict = None):
-        self.sync()
         if not meta:
             meta = {}
         responses = await self.dendrite(
@@ -31,7 +30,6 @@ class Gateway(API):
         return responses
 
     async def get_system_info(self):
-        self.sync()
         responses = await self.dendrite(
             axons=self.metagraph.axons,
             synapse=SystemInfoSynapse(),
