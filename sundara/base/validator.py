@@ -97,7 +97,14 @@ class BaseValidatorNeuron(BaseNeuron):
             )
 
             bt.logging.info(f"Attaching forward function to validator axon.")
+            
+            self.axon.attach(
+            forward_fn=self.forward,
+            blacklist_fn=self.blacklist,
+            priority_fn=self.priority)
+
             self.axon.attach(forward_fn=self.get_stats)
+
             bt.logging.info(f"Axon created: {self.axon}")
 
             try:
