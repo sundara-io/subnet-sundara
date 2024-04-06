@@ -76,6 +76,9 @@ async def chat(input: ChatInput):
 @app.post("/inference")
 async def inference(req: InferenceReq):
     resps = await gateway.inference(meta=req.meta, input=req.input)
+    for x in resps:
+        if x:
+            return {"meta": req.meta, "output": x}
     return {"meta": req.meta, "output": None}
 
 
