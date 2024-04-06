@@ -54,7 +54,7 @@ class MinerState:
 class Miner(BaseMinerNeuron):
     def __init__(self, config=None):
         super(Miner, self).__init__(config=config)
-        self.engine = get_engine_factory_by_name(config.engine.name)(models=config.engine.models)
+        self.engine = get_engine_factory_by_name(self.config.engine.name)(models=self.config.engine.models)
         if not os.getenv("SUNDARA_DISABLE_INFERENCE_ENGINE"):
             self.engine.start()
         self.miner_state = MinerState()
