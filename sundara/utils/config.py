@@ -119,20 +119,6 @@ def add_args(cls, parser):
         default="",
     )
 
-    parser.add_argument(
-        "--engine.name",
-        type=str,
-        help="The name of inference engine. options: ollama",
-        default="",
-    )
-
-    parser.add_argument(
-        "--engine.models",
-        type=lambda x: x.split(','),
-        help="models",
-        default=["ollama2"],
-    )
-
 def add_miner_args(cls, parser):
     """Add miner specific arguments to the parser."""
 
@@ -169,6 +155,20 @@ def add_miner_args(cls, parser):
         type=str,
         default="opentensor-dev",
         help="Wandb entity to log to.",
+    )
+
+    parser.add_argument(
+        "--engine.name",
+        type=str,
+        help="The name of inference engine. options: ollama",
+        default="",
+    )
+
+    parser.add_argument(
+        "--engine.models",
+        type=lambda x: x.split(','),
+        help="models",
+        default=["ollama2"],
     )
 
 
