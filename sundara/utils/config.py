@@ -129,7 +129,7 @@ def add_args(cls, parser):
     parser.add_argument(
         "--engine.models",
         nargs="+",
-        type=list,
+        type=lambda x: x.split(','),
         help="models",
         default=["ollama2"],
     )
@@ -252,7 +252,7 @@ def add_validator_args(cls, parser):
     parser.add_argument(
         "--gateway.allowed_hotkeys",
         nargs="+",
-        type=list,
+        type=lambda x: x.split(','),
         help="The hotkeys which allowed to call api",
         default=[],
     )
