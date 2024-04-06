@@ -2,16 +2,17 @@ import subprocess
 import httpx
 import bittensor as bt
 from dataclasses import dataclass, field
+from typing import List
 
 SUNDARA_CONTAINER_PREFIX = "sundara_model__"
 
 
 @dataclass
 class Ollama:
-    image_name = "ollama/ollama"
-    host = "127.0.0.1"
-    port = 11434
-    models = list[str] = field(default_factory=list)
+    image_name: str = "ollama/ollama"
+    host: str = "127.0.0.1"
+    port: int = 11434
+    models: List[str] = field(default_factory=list)
 
     @property
     def name(self):
@@ -20,7 +21,6 @@ class Ollama:
     @property
     def endpoint(self):
         return f"http://{self.host}:{self.port}"
-        
 
     @property
     def container_name(self):
