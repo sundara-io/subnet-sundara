@@ -31,7 +31,7 @@ def reward(query: int, response: InferenceSynapse) -> float:
     Returns:
     - float: The reward value for the miner.
     """
-    response.axon.process_time
+    # response.axon.process_time
     return 1.0 if response and response["response"] == str(query) else 0
 
 
