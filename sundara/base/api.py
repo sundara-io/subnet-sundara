@@ -23,10 +23,10 @@ import torch
 import asyncio
 import argparse
 import threading
-import bittensor as bt
-
-from typing import List
+import time
 from traceback import print_exception
+
+import bittensor as bt
 
 from sundara.base.neuron import BaseNeuron
 from sundara.mock import MockDendrite
@@ -126,11 +126,14 @@ class BaseAPINeuron(BaseNeuron):
                 # Check if we should exit.
                 if self.should_exit:
                     break
-
+                
+                time.sleep(5)
                 # Sync metagraph and potentially set weights.
                 self.sync()
 
                 self.step += 1
+
+                time
 
         # If someone intentionally stops the api, it'll safely terminate operations.
         except KeyboardInterrupt:
