@@ -33,12 +33,8 @@ from sundara.mock import MockDendrite
 from sundara.utils.config import add_validator_args
 
 
-class BaseValidatorNeuron(BaseNeuron):
-    """
-    Base class for Bittensor validators. Your validator should inherit from this class.
-    """
-
-    neuron_type: str = "ValidatorNeuron"
+class BaseAPINeuron(BaseNeuron):
+    neuron_type: str = "BaseAPINeuron"
 
     @classmethod
     def add_args(cls, parser: argparse.ArgumentParser):
@@ -87,8 +83,8 @@ class BaseValidatorNeuron(BaseNeuron):
 
         bt.logging.info("serving ip to chain...")
         try:
-            external_ip = os.getenv("SUNDARA_VALIDATOR_EXTERNAL_IP")
-            external_port = os.getenv("SUNDARA_VALIDATOR_EXTERNAL_PORT")
+            external_ip = os.getenv("SUNDARA_API_EXTERNAL_IP")
+            external_port = os.getenv("SUNDARA_API_EXTERNAL_PORT")
             self.axon = bt.axon(
                 wallet=self.wallet,
                 config=self.config,
@@ -96,7 +92,7 @@ class BaseValidatorNeuron(BaseNeuron):
                 external_port=int(external_port) if external_port else None,
             )
 
-            bt.logging.info(f"Attaching forward function to validator axon.")
+            bt.logging.info(f"Attaching forward function to api axon.")
             self.axon.attach(forward_fn=self.get_stats)
             bt.logging.info(f"Axon created: {self.axon}")
 
@@ -106,7 +102,7 @@ class BaseValidatorNeuron(BaseNeuron):
                     axon=self.axon,
                 )
                 bt.logging.info(
-                    f"Running validator {self.axon} on network: {self.config.subtensor.chain_endpoint} with netuid: {self.config.netuid}"
+                    f"Running api {self.axon} on network: {self.config.subtensor.chain_endpoint} with netuid: {self.config.netuid}"
                 )
             except Exception as e:
                 bt.logging.error(f"Failed to serve Axon with exception: {e}")
@@ -116,47 +112,16 @@ class BaseValidatorNeuron(BaseNeuron):
             bt.logging.error(f"Failed to create Axon initialize with exception: {e}")
             pass
 
-    async def concurrent_forward(self):
-        coroutines = [
-            self.forward() for _ in range(self.config.neuron.num_concurrent_forwards)
-        ]
-        await asyncio.gather(*coroutines)
-
     def run(self):
-        """
-        Initiates and manages the main loop for the miner on the Bittensor network. The main loop handles graceful shutdown on keyboard interrupts and logs unforeseen errors.
-
-        This function performs the following primary tasks:
-        1. Check for registration on the Bittensor network.
-        2. Continuously forwards queries to the miners on the network, rewarding their responses and updating the scores accordingly.
-        3. Periodically resynchronizes with the chain; updating the metagraph with the latest network state and setting weights.
-
-        The essence of the validator's operations is in the forward function, which is called every step. The forward function is responsible for querying the network and scoring the responses.
-
-        Note:
-            - The function leverages the global configurations set during the initialization of the miner.
-            - The miner's axon serves as its interface to the Bittensor network, handling incoming and outgoing requests.
-
-        Raises:
-            KeyboardInterrupt: If the miner is stopped by a manual interruption.
-            Exception: For unforeseen errors during the miner's operation, which are logged for diagnosis.
-        """
-
-        # Check that validator is registered on the network.
         self.sync()
 
-        # Start  starts the miner's axon, making it active on the network.
         self.axon.start()
 
-        bt.logging.info(f"Validator starting at block: {self.block}")
+        bt.logging.info(f"Api starting at block: {self.block}")
 
-        # This loop maintains the validator's operations until intentionally stopped.
         try:
             while True:
                 bt.logging.info(f"step({self.step}) block({self.block})")
-
-                # Run multiple forwards concurrently.
-                self.loop.run_until_complete(self.concurrent_forward())
 
                 # Check if we should exit.
                 if self.should_exit:
@@ -167,24 +132,24 @@ class BaseValidatorNeuron(BaseNeuron):
 
                 self.step += 1
 
-        # If someone intentionally stops the validator, it'll safely terminate operations.
+        # If someone intentionally stops the api, it'll safely terminate operations.
         except KeyboardInterrupt:
             self.axon.stop()
-            bt.logging.success("Validator killed by keyboard interrupt.")
+            bt.logging.success("Api killed by keyboard interrupt.")
             exit()
 
-        # In case of unforeseen errors, the validator will log the error and continue operations.
+        # In case of unforeseen errors, the api will log the error and continue operations.
         except Exception as err:
             bt.logging.error("Error during validation", str(err))
             bt.logging.debug(print_exception(type(err), err, err.__traceback__))
 
     def run_in_background_thread(self):
         """
-        Starts the validator's operations in a background thread upon entering the context.
-        This method facilitates the use of the validator in a 'with' statement.
+        Starts the api's operations in a background thread upon entering the context.
+        This method facilitates the use of the api in a 'with' statement.
         """
         if not self.is_running:
-            bt.logging.debug("Starting validator in background thread.")
+            bt.logging.debug("Starting api in background thread.")
             self.should_exit = False
             self.thread = threading.Thread(target=self.run, daemon=True)
             self.thread.start()
@@ -193,10 +158,10 @@ class BaseValidatorNeuron(BaseNeuron):
 
     def stop_run_thread(self):
         """
-        Stops the validator's operations that are running in the background thread.
+        Stops the api's operations that are running in the background thread.
         """
         if self.is_running:
-            bt.logging.debug("Stopping validator in background thread.")
+            bt.logging.debug("Stopping api in background thread.")
             self.should_exit = True
             self.thread.join(5)
             self.is_running = False
@@ -208,8 +173,8 @@ class BaseValidatorNeuron(BaseNeuron):
 
     def __exit__(self, exc_type, exc_value, traceback):
         """
-        Stops the validator's background operations upon exiting the context.
-        This method facilitates the use of the validator in a 'with' statement.
+        Stops the api's background operations upon exiting the context.
+        This method facilitates the use of the api in a 'with' statement.
 
         Args:
             exc_type: The type of the exception that caused the context to be exited.
@@ -220,67 +185,11 @@ class BaseValidatorNeuron(BaseNeuron):
                        None if the context was exited without an exception.
         """
         if self.is_running:
-            bt.logging.debug("Stopping validator in background thread.")
+            bt.logging.debug("Stopping api in background thread.")
             self.should_exit = True
             self.thread.join(5)
             self.is_running = False
             bt.logging.debug("Stopped")
-
-    def set_weights(self):
-        """
-        Sets the validator weights to the metagraph hotkeys based on the scores it has received from the miners. The weights determine the trust and incentive level the validator assigns to miner nodes on the network.
-        """
-
-        # Check if self.scores contains any NaN values and log a warning if it does.
-        if torch.isnan(self.scores).any():
-            bt.logging.warning(
-                f"Scores contain NaN values. This may be due to a lack of responses from miners, or a bug in your reward functions."
-            )
-
-        # Calculate the average reward for each uid across non-zero values.
-        # Replace any NaN values with 0.
-        raw_weights = torch.nn.functional.normalize(self.scores, p=1, dim=0)
-
-        bt.logging.debug("raw_weights", raw_weights)
-        bt.logging.debug("raw_weight_uids", self.metagraph.uids.to("cpu"))
-        # Process the raw weights to final_weights via subtensor limitations.
-        (
-            processed_weight_uids,
-            processed_weights,
-        ) = bt.utils.weight_utils.process_weights_for_netuid(
-            uids=self.metagraph.uids.to("cpu"),
-            weights=raw_weights.to("cpu"),
-            netuid=self.config.netuid,
-            subtensor=self.subtensor,
-            metagraph=self.metagraph,
-        )
-        bt.logging.debug("processed_weights", processed_weights)
-        bt.logging.debug("processed_weight_uids", processed_weight_uids)
-
-        # Convert to uint16 weights and uids.
-        (
-            uint_uids,
-            uint_weights,
-        ) = bt.utils.weight_utils.convert_weights_and_uids_for_emit(
-            uids=processed_weight_uids, weights=processed_weights
-        )
-        bt.logging.debug("uint_weights", uint_weights)
-        bt.logging.debug("uint_uids", uint_uids)
-
-        # Set the weights on chain via our subtensor connection.
-        result, msg = self.subtensor.set_weights(
-            wallet=self.wallet,
-            netuid=self.config.netuid,
-            uids=uint_uids,
-            weights=uint_weights,
-            wait_for_finalization=False,
-            wait_for_inclusion=False,
-            version_key=self.spec_version,
-        )
-        if result is True:
-            bt.logging.info("set_weights on chain successfully!")
-        else:
-            bt.logging.error("set_weights failed", msg)
 
     def resync_metagraph(self):
         """Resyncs the metagraph and updates the hotkeys and moving averages based on the new metagraph."""
@@ -316,41 +225,11 @@ class BaseValidatorNeuron(BaseNeuron):
         # Update the hotkeys.
         self.hotkeys = copy.deepcopy(self.metagraph.hotkeys)
 
-    def update_scores(self, rewards: torch.FloatTensor, uids: List[int]):
-        """Performs exponential moving average on the scores based on the rewards received from the miners."""
-
-        # Check if rewards contains NaN values.
-        if torch.isnan(rewards).any():
-            bt.logging.warning(f"NaN values detected in rewards: {rewards}")
-            # Replace any NaN values in rewards with 0.
-            rewards = torch.nan_to_num(rewards, 0)
-
-        # Check if `uids` is already a tensor and clone it to avoid the warning.
-        if isinstance(uids, torch.Tensor):
-            uids_tensor = uids.clone().detach()
-        else:
-            uids_tensor = torch.tensor(uids).to(self.device)
-
-        # Compute forward pass rewards, assumes uids are mutually exclusive.
-        # shape: [ metagraph.n ]
-        scattered_rewards: torch.FloatTensor = self.scores.scatter(
-            0, uids_tensor, rewards
-        ).to(self.device)
-        bt.logging.debug(f"Scattered rewards: {rewards}")
-
-        # Update scores with rewards produced by this step.
-        # shape: [ metagraph.n ]
-        alpha: float = self.config.neuron.moving_average_alpha
-        self.scores: torch.FloatTensor = alpha * scattered_rewards + (
-            1 - alpha
-        ) * self.scores.to(self.device)
-        bt.logging.debug(f"Updated moving avg scores: {self.scores}")
-
     def save_state(self):
-        """Saves the state of the validator to a file."""
-        bt.logging.info("Saving validator state.")
+        """Saves the state of the api to a file."""
+        bt.logging.info("Saving api state.")
 
-        # Save the state of the validator to file.
+        # Save the state of the api to file.
         torch.save(
             {
                 "step": self.step,
@@ -361,10 +240,10 @@ class BaseValidatorNeuron(BaseNeuron):
         )
 
     def load_state(self):
-        """Loads the state of the validator from a file."""
-        bt.logging.info("Loading validator state.")
+        """Loads the state of the api from a file."""
+        bt.logging.info("Loading api state.")
 
-        # Load the state of the validator from file.
+        # Load the state of the api from file.
         state = torch.load(self.config.neuron.full_path + "/state.pt")
         self.step = state["step"]
         self.scores = state["scores"]

@@ -5,12 +5,10 @@ from fastapi.middleware.cors import CORSMiddleware
 
 import uvicorn
 import bittensor as bt
-from sundara.utils.config import check_config, add_args, config
-from sundara.base.neuron import BaseNeuron
 from sundara.protocol import InferenceSynapse, SystemInfo, SystemInfoSynapse
 from pydantic import BaseModel
 from sundara.utils.uids import get_random_uids
-from neurons.gateway import GatewayNeuron
+from neurons.api import API
 
 
 class ChatInput(BaseModel):
@@ -18,7 +16,7 @@ class ChatInput(BaseModel):
     input: str = ""
 
 
-class Gateway(GatewayNeuron):
+class Gateway(API):
     async def inference(self, input: dict, meta: dict = None):
         self.sync()
         if not meta:
@@ -27,7 +25,7 @@ class Gateway(GatewayNeuron):
             axons=self.metagraph.axons,
             synapse=InferenceSynapse(meta=meta, input=input),
             deserialize=True,
-            timeout=meta.get("timeout", 5.0)
+            timeout=meta.get("timeout", 5.0),
         )
         print(responses)
         return responses
@@ -38,13 +36,14 @@ class Gateway(GatewayNeuron):
             axons=self.metagraph.axons,
             synapse=SystemInfoSynapse(),
             deserialize=True,
-            timeout=5.0
+            timeout=5.0,
         )
         print(responses)
         return responses
 
 
 gateway = Gateway()
+gateway.run_in_background_thread()
 
 app = FastAPI()
 
