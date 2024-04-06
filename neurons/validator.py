@@ -30,7 +30,7 @@ from sundara.validator import forward
 
 # import base validator class which takes care of most of the boilerplate
 from sundara.base.validator import BaseValidatorNeuron
-from sundara.protocol import InferenceSynapse
+from sundara.protocol import InferenceSynapse, APIInferenceSynapse
 
 
 class Validator(BaseValidatorNeuron):
@@ -62,7 +62,7 @@ class Validator(BaseValidatorNeuron):
         # TODO(developer): Rewrite this function based on your protocol definition.
         return await forward(self)
 
-    async def blacklist(self, synapse: InferenceSynapse) -> typing.Tuple[bool, str]:
+    async def blacklist(self, synapse: APIInferenceSynapse) -> typing.Tuple[bool, str]:
         """
         Determines whether an incoming request should be blacklisted and thus ignored. Your implementation should
         define the logic for blacklisting requests based on your needs and desired security parameters.
@@ -117,7 +117,7 @@ class Validator(BaseValidatorNeuron):
         )
         return False, "Hotkey recognized!"
 
-    async def priority(self, synapse: InferenceSynapse) -> float:
+    async def priority(self, synapse: APIInferenceSynapse) -> float:
         """
         The priority function determines the order in which requests are handled. More valuable or higher-priority
         requests are processed before others. You should design your own priority mechanism with care.

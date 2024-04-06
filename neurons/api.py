@@ -47,7 +47,7 @@ class API(BaseAPINeuron):
 
 
     async def blacklist(
-        self, synapse: InferenceSynapse
+        self, synapse: APIInferenceSynapse
     ) -> typing.Tuple[bool, str]:
         """
         Determines whether an incoming request should be blacklisted and thus ignored. Your implementation should
@@ -103,7 +103,7 @@ class API(BaseAPINeuron):
         )
         return False, "Hotkey recognized!"
     
-    async def priority(self, synapse: InferenceSynapse) -> float:
+    async def priority(self, synapse: APIInferenceSynapse) -> float:
         """
         The priority function determines the order in which requests are handled. More valuable or higher-priority
         requests are processed before others. You should design your own priority mechanism with care.
