@@ -64,18 +64,6 @@ def add_args(cls, parser):
     parser.add_argument("--netuid", type=int, help="Subnet netuid", default=1)
 
     parser.add_argument(
-        "--subtensor.network",
-        default="finney",
-        help="Bittensor network to connect to.",
-    )
-
-    parser.add_argument(
-        "--subtensor.chain_endpoint",
-        default="wss://entrypoint-finney.opentensor.ai:443",
-        help="Chain endpoint to connect to.",
-    )
-
-    parser.add_argument(
         "--neuron.epoch_length",
         type=int,
         help="The default epoch length (how often we set weights, measured in 12 second blocks).",
