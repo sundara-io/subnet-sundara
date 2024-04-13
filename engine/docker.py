@@ -63,13 +63,14 @@ class Ollama:
                             "model": model_name,
                             "stream": True,
                         },
+                        timeout=None
                     ) as resp:
                         for line in resp.iter_lines():
                             bt.logging.info(f"ollama: {line}")
                         resp.raise_for_status()
                 except httpx.HTTPStatusError as e:
                     bt.logging.error(e)
-                    pass
+                    raise
         except Exception as e:
             bt.logging.error(e)
 
