@@ -64,13 +64,6 @@ def add_args(cls, parser):
     parser.add_argument("--netuid", type=int, help="Subnet netuid", default=1)
 
     parser.add_argument(
-        "--neuron.device",
-        type=str,
-        help="Device to run on.",
-        default="cuda" if torch.cuda.is_available() else "cpu",
-    )
-
-    parser.add_argument(
         "--neuron.epoch_length",
         type=int,
         help="The default epoch length (how often we set weights, measured in 12 second blocks).",
