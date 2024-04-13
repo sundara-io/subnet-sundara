@@ -87,13 +87,9 @@ class BaseValidatorNeuron(BaseNeuron):
 
         bt.logging.info("serving ip to chain...")
         try:
-            external_ip = os.getenv("SUNDARA_VALIDATOR_EXTERNAL_IP")
-            external_port = os.getenv("SUNDARA_VALIDATOR_EXTERNAL_PORT")
             self.axon = bt.axon(
                 wallet=self.wallet,
                 config=self.config,
-                external_ip=external_ip,
-                external_port=int(external_port) if external_port else None,
             )
 
             bt.logging.info(f"Attaching forward function to validator axon.")

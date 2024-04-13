@@ -57,14 +57,10 @@ class BaseMinerNeuron(BaseNeuron):
             bt.logging.warning(
                 "You are allowing non-registered entities to send requests to your miner. This is a security risk."
             )
-        external_ip = os.getenv("SUNDARA_MINER_EXTERNAL_IP")
-        external_port = os.getenv("SUNDARA_MINER_EXTERNAL_PORT")
         # The axon handles request processing, allowing validators to send this miner requests.
         self.axon = bt.axon(
             wallet=self.wallet,
             config=self.config,
-            external_ip=external_ip,
-            external_port=int(external_port) if external_port else None,
         )
 
         # Attach determiners which functions are called when servicing a request.
