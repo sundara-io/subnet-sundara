@@ -97,16 +97,16 @@ BUILD_BINARY=0 ./scripts/localnet.sh
 `cd` to your project directory and clone the bittensor subnet template repository:
 
 ```bash
-git clone https://github.com/opentensor/bittensor-subnet-template.git
+git clone https://github.com/sundara-io/subnet-sundara.git
 ```
 
 Navigate to the cloned repository:
 
 ```bash
-cd bittensor-subnet-template
+cd subnet-sundara
 ```
 
-Install the bittensor-subnet-template Python package:
+Install the subnet-sundara Python package:
 
 ```bash
 python -m pip install -e .

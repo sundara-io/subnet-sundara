@@ -5,7 +5,7 @@ This tutorial shows how to use the Bittensor testnet to create a subnet and run 
 **IMPORTANT:** We strongly recommend that you first run [Running Subnet Locally](running_on_staging.md) before running on the testnet. Incentive mechanisms running on the testnet are open to anyone, and although these mechanisms on testnet do not emit real TAO, they cost you test TAO which you must create. 
 
 **DANGER**
-- Do not expose your private keys.
+- Do not expose your private keys.subnet-sundara
 - Only use your testnet wallet.
 - Do not reuse the password of your mainnet wallet.
 - Make sure your incentive mechanism is resistant to abuse. 
@@ -22,19 +22,19 @@ After installing `bittensor`, proceed as below:
 
 **NOTE: Skip this step if** you already did this during local testing and development.
 
-`cd` into your project directory and clone the bittensor-subnet-template repo:
+`cd` into your project directory and clone the subnet-sundara repo:
 
 ```bash
-git clone https://github.com/opentensor/bittensor-subnet-template.git 
+git clone https://github.com/sundara-io/subnet-sundara.git 
 ```
 
-Next, `cd` into bittensor-subnet-template repo directory:
+Next, `cd` into subnet-sundara repo directory:
 
 ```bash
-cd bittensor-subnet-template # Enter the 
+cd subnet-sundara # Enter the 
 ```
 
-Install the bittensor-subnet-template package:
+Install the subnet-sundara package:
 
 ```bash
 python -m pip install -e . 

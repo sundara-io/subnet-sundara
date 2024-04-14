@@ -31,13 +31,13 @@ After installing `bittensor`, proceed as below:
 In your project directory:
 
 ```bash
-git clone https://github.com/opentensor/bittensor-subnet-template.git 
+git clone https://github.com/sundara-io/subnet-sundara.git 
 ```
 
-Next, `cd` into `bittensor-subnet-template` repo directory:
+Next, `cd` into `subnet-sundara` repo directory:
 
 ```bash
-cd bittensor-subnet-template
+cd subnet-sundara
 ```
 
 Install the Bittensor subnet template package:
