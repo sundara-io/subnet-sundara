@@ -130,6 +130,6 @@ YA validator hotkey is required for running the gateway.
 You can start the miner by running the following command:
 
 ```bash
- python gateway/gateway.py --netuid 130 --subtensor.network test --wallet.name miner --wallet.hotkey default --logging.debug 
+ python gateway/gateway.py --netuid 130 --subtensor.network test --wallet.name validator --wallet.hotkey default --logging.debug 
 
 ```
