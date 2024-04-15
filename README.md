@@ -25,16 +25,22 @@ The workflow of Sundara is roughly divided into these steps.:
 
 1. **Preparation in Advance**: AI models will be registered in advance in the Sundara Model Registry. Physical devices in Sundara won't directly run the models, but will operate in the form of containers when needed. Containers provide a uniform operating environment for AI models, thus facilitating convenient scheduling and scale out.
 2. **Proxy Computing Request**: When the light node undertakes a computing task related to the AI model, it forwards this task to the Sundara validator. The validator is responsible for accepting external task requests. It parses the model name from parameters and selects several qualified miners for task execution. 
-3. **Perform computing tasks**: The miners receive the computing task, will run the model in container locally, and return the results to the validator. The miners are not limited to the model and can pull the image from the model registry at any time to undertake AI inference tasks. 
-4. **Verify the results**: After receiving the results from the miners, the validator will verify whether their results are correct. Under the condition of consistent input parameters and a fixed random seed, the AI model will definitely return consistent results.
+3. **Perform Computing Tasks**: The miners receive the computing task, will run the model in container locally, and return the results to the validator. The miners are not limited to the model and can pull the image from the model registry at any time to undertake AI inference tasks. 
+4. **Verify the Results**: After receiving the results from the miners, the validator will verify whether their results are correct. Under the condition of consistent input parameters and a fixed random seed, the AI model will definitely return consistent results.
 5. **Reward Model**: Rewards will be issued based on the consistency of the results and the time consumed. If the validator verifies that the results are inconsistent, there will be no rewards. If the results are consistent, ranking will be performed based on the time consumed.
 6. **Metrics and Orchestration:** Sundara will keep collecting metrics and automatically adjust the model tasks according to the load situation. If there are unavailable or dishonest nodes in the network, Orchestrator will immediately replace the nodes to ensure the stability and availability of the entire network.
+
+## Validation
+
+In the AI model's inference scenario, we can ensure consistent output for the same input by fixing the random seed. The model must meet certain requirements, such as the use of standardized data preprocessing technology. Mainstream AI models like LLaMA and Stable Diffusion can all ensure this consistency.
+
+In Sundara, the Validator uses the same random seed and parameters to conduct inference tasks and verify the miners' computing results. Rewards are distributed based on the accuracy of the results and the time taken. The longer the computation, the less reward weight is allocated.
 
 ## Technical features
 
 - **Scheduling to improve utilization rate**: In Sundara, the device will not be bound with a certain model. We use the lightweight operation method of containers, allowing each machine to run multiple models, thus intelligently scheduling according to the needs of the scenario, reducing the idle time of the device, and improving the utilization rate of computing power.
 - **Orchestration to ensure availability**: Sundara will keep collecting metrics from AI model containers and replace unavailable nodes with new ones. All users need to do is provide a AI model. Sundara will ensure the availability of these instances through real-time metrics monitoring and automatic orchestration.
-- **GPU Virtualization to run in parallel**: Sundara will also further optimize on the GPU level. Through vGPU and virtualization technology, large-scale GPU devices are broken down into vGPUs more suitable for small model inference scenarios, in order to further improve the usage rate of computing power and increase the computing power task carrying capacity of the platform.
+- **GPU virtualization to run in parallel**: Sundara will also further optimize on the GPU level. Through vGPU and virtualization technology, large-scale GPU devices are broken down into vGPUs more suitable for small model inference scenarios, in order to further improve the usage rate of computing power and increase the computing power task carrying capacity of the platform.
 
 ## Guide
 
