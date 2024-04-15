@@ -1,47 +1,47 @@
-## **Introduction**
+# Sundara - Collaborative Mining Network
+
+
+## Introduction
 
 **Background**
 
-For developers, the computing tasks of subnet generally require high-configuration GPU devices, which has a high entry barrier. Even if model developers have developed excellent AI models, they can't join other subnets in bittensor, and can't earn income from their own models.
+Many subnets in Bittensor now require GPUs to perform inference tasks and receive rewards based on performance. However, many excellent model developers do not have enough GPUs to join the subnet as miners. The high cost of computing power equipment has become a barrier for more excellent developers to enter the AI ecosystem.
 
 **What is Sundara**
 
-Sundara is a collaborative mining protocol that provides accessible and adaptable hardware services for the forthcoming open AI network.
+Sundara is building a decentralized collaborative mining network that aggregates and optimizes GPU resources to provide efficient and reliable computing power for AI tasks, initially focusing on model inference and eventually expanding to support more complex tasks like model training.
 
-We're constructing a distributed computing power scheduling system, designed to substantially reduce the barriers to entry for AI computational resources. This empowers proficient developers within the ML community to contribute to AI development, while also making top-tier AI models accessible to a broader audience. Ultimately, our goal is to make AI widely available to consumers.
+With Sundara, users can join Bittensor subnets as a light node and cooperate with Sundara subnet for mining. This allows top models to be rapidly integrated into the Bittensor network without concern for GPU limitations. Models that yield better results receive more rewards, incentivizing AI developers to continually enhance their models.
 
-We aspire to enable exceptional model developers to concentrate on model optimization and iteration by providing collaborative mining opportunities for computational power.
+Sundara will keep updating the scheduling algorithm on the Bittensor subnet to make sure the whole network of computing power scheduling is stable and available.
 
-With the introduction of the Sundara subnet, users can now join the subnet and collaborate with Sundara in mining activities. This facilitates rapid deployment of exceptional models onto the Bittensor network, liberating them from GPU device constraints. Superior models, owing to their closer approximation to accurate results, are poised to receive greater rewards, thereby incentivizing AI model developers to iteratively develop and refine more outstanding models.
+## System Design
 
-Sundara will continuously iterate and evolve the scheduling algorithm through the Bittensor subnet, to ensure the stability and availability of the entire computing power scheduling network.
+Sundara provides a computing power liquidity pool to collaboratively complete AI inference tasks. Other Bittensor subnets and projects only need to maintain their own lightweight nodes, and distribute heavy computing tasks to the Sundara subnet for collaboration.
 
-## Collaborative Mining
+![Sundara System Design](https://github.com/sundara-io/subnet-sundara/assets/6276527/0a904bc2-0762-4005-ad1f-07715001dee5)
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/774f85dd-b10c-4c33-a581-451afbd22b88/3935490a-894c-4603-acf1-315aff9d491d/Untitled.png)
+The workflow of Sundara is roughly divided into these steps.:
 
-We provide a computing power liquidity pool to collaboratively complete computing tasks. Other Bittensor subnets and projects can focus on the business logic itself, only need to maintain their own lightweight nodes, and allocate heavy computing tasks to the Sundara subnet for collaboration.
+1. **Preparation in Advance**: AI models will be registered in advance in the Sundara Model Registry. Physical devices in Sundara won't directly run the models, but will operate in the form of containers when needed. Containers provide a uniform operating environment for AI models, thus facilitating convenient scheduling and scale out.
+2. **Proxy Computing Request**: When the light node undertakes a computing task related to the AI model, it forwards this task to the Sundara validator. The validator is responsible for accepting external task requests. It parses the model name from parameters and selects several qualified miners for task execution. 
+3. **Perform computing tasks**: The miners receive the computing task, will run the model in container locally, and return the results to the validator. The miners are not limited to the model and can pull the image from the model registry at any time to undertake AI inference tasks. 
+4. **Verify the results**: After receiving the results from the miners, the validator will verify whether their results are correct. Under the condition of consistent input parameters and a fixed random seed, the AI model will definitely return consistent results.
+5. **Reward Model**: Rewards will be issued based on the consistency of the results and the time consumed. If the validator verifies that the results are inconsistent, there will be no rewards. If the results are consistent, ranking will be performed based on the time consumed.
+6. **Metrics and Orchestration:** Sundara will keep collecting metrics and automatically adjust the model tasks according to the load situation. If there are unavailable or dishonest nodes in the network, Orchestrator will immediately replace the nodes to ensure the stability and availability of the entire network.
 
-We will define a set of communication schemas and interfaces for external parties to publish computing tasks to Sundara, validators to accept tasks, and distribute them to the underlying miner nodes.
-We will distribute tasks to the underlying computing power equipment network through scheduling algorithms, improve the utilization rate of individual devices through virtualization technology, smooth out fluctuations in call volume and improve the capacity of the entire network by supporting multi-model inference, and ensure the high availability of the entire network through real-time monitoring and automatic scaling in and out.
+## Technical features
 
-- Validator: Accepts external task requests, parses parameters to select a qualified miner to execute the task, and is responsible for verifying the consistency of the model results after receiving them, confirming that the miner has completed the task as required.
-- Miner: The miner is not limited to the model, and can pull the image from the model registry at any time to gain the ability to undertake computing tasks. Upon receiving the validator's scheduling, it will match the model and perform the computing task, and return the result.
-- Reward Model: Rewards will be issued based on the consistency of the results and the time consumed. If the validator verifies that the results are inconsistent, there will be no rewards. If the results are consistent, ranking will be performed based on the time consumed.
-
-### **Technical Advantages**
-
-- Traditional computing networks aggregate computing power, with a focus on connecting computing power networks and building computing power clusters. However, they cannot improve the utilization rate of computing power equipment. For some scenarios, such as peaks and troughs in call volumes and high computing power devices running low computing power tasks for a long time, there is a huge waste of computing power.
-- Sundara will schedule computing power from the task dimension, prioritizing matching with the most suitable computing power resources to avoid waste of computing power. At the same time, it will also try to reuse computing power devices. A single device can run multiple models, meeting the various needs of different users in different scenarios, thereby providing more stable and cheaper computing power resources.
-- Sundara will also further optimize on the GPU level. Through vGPU and virtualization technology, large-scale GPU devices are broken down into vGPUs more suitable for small model inference scenarios, in order to further improve the usage rate of computing power and increase the computing power task carrying capacity of the platform.
-- For large-scale training tasks, Sundara will provide task slice clusters based on vGPU. Through task decomposition and combination by layer/data, it meets the needs of large-scale model training.
+- **Scheduling to improve utilization rate**: In Sundara, the device will not be bound with a certain model. We use the lightweight operation method of containers, allowing each machine to run multiple models, thus intelligently scheduling according to the needs of the scenario, reducing the idle time of the device, and improving the utilization rate of computing power.
+- **Orchestration to ensure availability**: Sundara will keep collecting metrics from AI model containers and replace unavailable nodes with new ones. All users need to do is provide a AI model. Sundara will ensure the availability of these instances through real-time metrics monitoring and automatic orchestration.
+- **GPU Virtualization to run in parallel**: Sundara will also further optimize on the GPU level. Through vGPU and virtualization technology, large-scale GPU devices are broken down into vGPUs more suitable for small model inference scenarios, in order to further improve the usage rate of computing power and increase the computing power task carrying capacity of the platform.
 
 ## Guide
 
 **Validator Installation**
 
-Please see [Validator Setup](./docs/quickstart.md#validator-setup) in the [quick start guide](./docs/quickstart.md).
+Please see [Validator Setup](./docs/quickstart.md#validator-setup).
 
 **Miner Installation**
 
-Please see [Miner Setup](./docs/quickstart.md#miner-setup) in the [quick start guide](./docs/quickstart.md)
+Please see [Miner Setup](./docs/quickstart.md#miner-setup).
