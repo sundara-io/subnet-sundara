@@ -117,13 +117,13 @@ You can start the miner by running the following command:
 
 ```
 
-### Start the Gateway
+### Gateway Setup
 
 You may need to setup your wallet and hotkey according to [running on testnet](./docs/running_on_testnet.md).
 
 Gateway allows you to access the subnet and do inference call from external network.
 
-YA validator hotkey is required for running the gateway.
+A validator hotkey is required for running the gateway.
 
 ### Start the Gateway
 
