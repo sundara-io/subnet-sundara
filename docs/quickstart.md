@@ -117,7 +117,7 @@ You can start the miner by running the following command:
 
 ```
 
-### Gateway Setup
+## Gateway Setup
 
 You may need to setup your wallet and hotkey according to [running on testnet](./docs/running_on_testnet.md).
 
