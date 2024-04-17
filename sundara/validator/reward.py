@@ -35,12 +35,12 @@ def reward(reference, response: InferenceSynapse) -> float:
         return 0
     if response.output.get("response") != reference["response"]:
         return 0
-    return 1/response.axon.process_time
+    return 1 / response.axon.process_time
 
 
 def get_rewards(
     self,
-    query: int,
+    reference,
     responses: List[float],
 ) -> torch.FloatTensor:
     """
@@ -53,6 +53,6 @@ def get_rewards(
     Returns:
     - torch.FloatTensor: A tensor of rewards for the given query and responses.
     """
-    return torch.FloatTensor([reward(query, response) for response in responses]).to(
-        self.device
-    )
+    return torch.FloatTensor(
+        [reward(reference, response) for response in responses]
+    ).to(self.device)
