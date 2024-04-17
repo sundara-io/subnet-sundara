@@ -35,7 +35,7 @@ def reward(reference, response: InferenceSynapse) -> float:
         return 0
     if response.output.get("response") != reference["response"]:
         return 0
-    return 1 / response.axon.process_time
+    return 1 / response.dendrite.process_time
 
 
 def get_rewards(
