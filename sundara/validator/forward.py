@@ -37,24 +37,20 @@ async def forward(self):
     miner_uids = await get_idle_uids(self, k=self.config.neuron.sample_size)
 
     input = dict(
-                model="llama2",
-                prompt=f"reply me with only the text '{self.step}', without any newline character",
-                options={
-                    "temperature": 0
-                },
-            )
+        model="llama2",
+        prompt=f"reply me with only the text '{self.step}', without any newline character",
+        options={"temperature": 0},
+    )
 
     responses = await self.dendrite(
         axons=[self.metagraph.axons[uid] for uid in miner_uids],
-        synapse=InferenceSynapse(
-            input=input
-        ),
+        synapse=InferenceSynapse(input=input),
         deserialize=False,
     )
 
     # Log the results for monitoring purposes.
     bt.logging.info(f"Received responses: {responses}")
-    reference = self.engine.inference(input)
+    reference = await self.engine.inference(input)
 
     # Adjust the scores based on responses from miners.
     rewards = get_rewards(self, reference=reference, responses=responses)
