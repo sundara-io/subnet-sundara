@@ -20,6 +20,7 @@
 
 import time
 import typing
+import os
 
 # Bittensor
 import bittensor as bt
@@ -31,7 +32,7 @@ from sundara.validator import forward
 # import base validator class which takes care of most of the boilerplate
 from sundara.base.validator import BaseValidatorNeuron
 from sundara.protocol import InferenceSynapse, APIInferenceSynapse
-
+from engine import get_engine_factory_by_name
 
 class Validator(BaseValidatorNeuron):
     """
@@ -47,6 +48,13 @@ class Validator(BaseValidatorNeuron):
 
         bt.logging.info("load_state()")
         self.load_state()
+
+        self.engine = get_engine_factory_by_name(self.config.engine.name)(models=self.config.engine.models)
+        if not os.getenv("SUNDARA_DISABLE_INFERENCE_ENGINE"):
+            self.engine.start()
+
+    def stop(self):
+        self.engine.stop()
 
     async def forward(self):
         """

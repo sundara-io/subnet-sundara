@@ -23,7 +23,7 @@ import re
 from sundara.protocol import InferenceSynapse
 
 
-def reward(query: int, response: InferenceSynapse) -> float:
+def reward(reference, response: InferenceSynapse) -> float:
     """
     Reward the miner response to the dummy request. This method returns a reward
     value for the miner, which is used to update the miner's score.
@@ -31,8 +31,11 @@ def reward(query: int, response: InferenceSynapse) -> float:
     Returns:
     - float: The reward value for the miner.
     """
-    # response.axon.process_time
-    return 1.0 if response and response["response"] == str(query) else 0
+    if response.is_failure:
+        return 0
+    if response.output.get("response") != reference["response"]:
+        return 0
+    return 1/response.axon.process_time
 
 
 def get_rewards(
@@ -50,7 +53,6 @@ def get_rewards(
     Returns:
     - torch.FloatTensor: A tensor of rewards for the given query and responses.
     """
-    # Get all the reward results by iteratively calling your reward() function.
     return torch.FloatTensor([reward(query, response) for response in responses]).to(
         self.device
     )

@@ -113,7 +113,7 @@ You may need to setup your wallet and hotkey according to [running on testnet](.
 You can start the miner by running the following command:
 
 ```bash
- python neurons/validator.py --netuid 130 --subtensor.network test --wallet.name miner --wallet.hotkey default --logging.debug
+ python neurons/validator.py --netuid 130 --subtensor.network test --wallet.name miner --wallet.hotkey default --logging.debug --engine.name ollama --engine.models llama2,mistral
 
 ```
 
@@ -130,6 +130,5 @@ A validator hotkey is required for running the gateway.
 You can start the miner by running the following command:
 
 ```bash
- python gateway/gateway.py --netuid 130 --subtensor.network test --wallet.name validator --wallet.hotkey default --logging.debug 
-
+ python gateway/gateway.py --netuid 130 --subtensor.network test --wallet.name validator --wallet.hotkey default --logging.debug
 ```

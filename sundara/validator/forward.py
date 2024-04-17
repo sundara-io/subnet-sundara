@@ -36,27 +36,28 @@ async def forward(self):
     """
     miner_uids = await get_idle_uids(self, k=self.config.neuron.sample_size)
 
-    # The dendrite client queries the network.
-    responses = await self.dendrite(
-        # Send the query to selected miner axons in the network.
-        axons=[self.metagraph.axons[uid] for uid in miner_uids],
-        # Construct a dummy query. This simply contains a single integer.
-        synapse=InferenceSynapse(
-            input=dict(
+    input = dict(
                 model="llama2",
                 prompt=f"reply me with only the text '{self.step}', without any newline character",
+                options={
+                    "temperature": 0
+                },
             )
+
+    responses = await self.dendrite(
+        axons=[self.metagraph.axons[uid] for uid in miner_uids],
+        synapse=InferenceSynapse(
+            input=input
         ),
-        # All responses have the deserialize function called on them before returning.
-        # You are encouraged to define your own deserialization function.
-        deserialize=True,
+        deserialize=False,
     )
 
     # Log the results for monitoring purposes.
     bt.logging.info(f"Received responses: {responses}")
+    reference = self.engine.inference(input)
 
     # Adjust the scores based on responses from miners.
-    rewards = get_rewards(self, query=self.step, responses=responses)
+    rewards = get_rewards(self, reference=reference, responses=responses)
 
     bt.logging.info(f"Scored responses: {rewards}")
     # Update the scores based on the rewards. You may want to define your own update_scores function for custom behavior.
